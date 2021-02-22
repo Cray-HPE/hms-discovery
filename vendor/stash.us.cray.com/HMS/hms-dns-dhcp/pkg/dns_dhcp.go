@@ -28,9 +28,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"stash.us.cray.com/HMS/hms-base"
 	"stash.us.cray.com/HMS/hms-smd/pkg/sm"
 )
 
@@ -38,6 +40,8 @@ type DNSDHCPHelper struct {
     HSMURL string
     HTTPClient *retryablehttp.Client
 }
+
+var serviceName string
 
 func NewDHCPDNSHelper(HSMURL string, HTTPClient *retryablehttp.Client) (helper DNSDHCPHelper) {
     helper.HSMURL = HSMURL
@@ -48,13 +52,43 @@ func NewDHCPDNSHelper(HSMURL string, HTTPClient *retryablehttp.Client) (helper D
         helper.HTTPClient = retryablehttp.NewClient()
     }
 
+    if (serviceName == "") {
+        var err error
+        serviceName,err = os.Hostname()
+        if (err != nil) {
+            serviceName = "DNS_DHCP"
+        }
+    }
+
     return
+}
+
+func NewDHCPDNSHelperInstance(HSMURL string, HTTPClient *retryablehttp.Client, svcName string) (helper DNSDHCPHelper) {
+	serviceName = svcName
+	return NewDHCPDNSHelper(HSMURL, HTTPClient)
+}
+
+func rtGet(helper *DNSDHCPHelper, url string) (*http.Response, error) {
+	req,err := http.NewRequest("GET",url,nil)
+	if (err != nil) {
+		return nil,err
+	}
+	base.SetHTTPUserAgent(req,serviceName)
+	rtReq,rtErr := retryablehttp.FromRequest(req)
+	if (rtErr != nil) {
+		return nil,rtErr
+	}
+	rsp, rspErr := helper.HTTPClient.Do(rtReq)
+	if (rspErr != nil) {
+		return nil,rspErr
+	}
+	return rsp,nil
 }
 
 func (helper *DNSDHCPHelper) GetUnknownComponents() (unknownComponents []sm.CompEthInterface, err error) {
     url := fmt.Sprintf("%s/Inventory/EthernetInterfaces?ComponentID", helper.HSMURL)
 
-    response, err := helper.HTTPClient.Get(url)
+    response, err := rtGet(helper,url)
     if err != nil {
         return
     }

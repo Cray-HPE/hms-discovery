@@ -93,7 +93,7 @@ stash.us.cray.com/HMS/hms-base
 stash.us.cray.com/HMS/hms-certs/pkg/hms_certs
 # stash.us.cray.com/HMS/hms-compcredentials v1.10.0
 stash.us.cray.com/HMS/hms-compcredentials
-# stash.us.cray.com/HMS/hms-dns-dhcp v1.4.0
+# stash.us.cray.com/HMS/hms-dns-dhcp v1.4.1
 stash.us.cray.com/HMS/hms-dns-dhcp/pkg
 # stash.us.cray.com/HMS/hms-securestorage v1.11.0
 stash.us.cray.com/HMS/hms-securestorage

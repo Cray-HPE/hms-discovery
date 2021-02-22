@@ -794,8 +794,8 @@ stash.us.cray.com/HMS/hms-certs v1.2.0 h1:sntICwYa5W04CeXBkoHyk1K6P1TGqO1s8Y+DNX
 stash.us.cray.com/HMS/hms-certs v1.2.0/go.mod h1:G8+mHi2izwVRF6WkxobnRAnAgcE79CIgvmtJU4HkIcI=
 stash.us.cray.com/HMS/hms-compcredentials v1.10.0 h1:I0z3cW1FJ92TMbHq7BKFX7NXnu1MFFGgZkKTLw4sih0=
 stash.us.cray.com/HMS/hms-compcredentials v1.10.0/go.mod h1:G7HccBFy+wJkxdxSgVRmGm0MzG3KBFNtkx9NW41jMlA=
-stash.us.cray.com/HMS/hms-dns-dhcp v1.4.0 h1:XGVTJywKe8sfgVnmIz5WSgIBUMyag9eyxzE23NG+zsQ=
-stash.us.cray.com/HMS/hms-dns-dhcp v1.4.0/go.mod h1:7nu5+ffbfa04kBm3YcF9ChkWbbTTaQRP4Q3m93sH7Q4=
+stash.us.cray.com/HMS/hms-dns-dhcp v1.4.1 h1:PjXq5Npue2cShyWuYga9+X2zzx9EVJ4qjLVjV/6Tsjg=
+stash.us.cray.com/HMS/hms-dns-dhcp v1.4.1/go.mod h1:7nu5+ffbfa04kBm3YcF9ChkWbbTTaQRP4Q3m93sH7Q4=
 stash.us.cray.com/HMS/hms-go-http-lib v1.4.0/go.mod h1:eJFHFY3OmoLhTTauAaaUtKGl0+4XdpIRTXokvNVRFJU=
 stash.us.cray.com/HMS/hms-msgbus v1.9.0/go.mod h1:1e76godR4v0zXFnn+jYlFUujDGbeXN3ciploERU2Puk=
 stash.us.cray.com/HMS/hms-s3 v1.8.0/go.mod h1:MFPhPEgOL+FEPZ0/AJNtWIsHJKgvxga4QJPbC0rYFBs=
