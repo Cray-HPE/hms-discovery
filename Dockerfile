@@ -21,7 +21,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 # Build base just has the packages installed we need.
-FROM dtr.dev.cray.com/baseos/golang:1.14-alpine3.12 AS build-base
+FROM arti.dev.cray.com/baseos-docker-master-local/golang:1.14-alpine3.12 AS build-base
 
 RUN set -ex \
     && apk update \
@@ -44,7 +44,7 @@ RUN set -ex \
 
 
 # Stage all of the Mountain discovery stuff in advance.
-FROM dtr.dev.cray.com/baseos/alpine:3.12 AS mountain-base
+FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.12 AS mountain-base
 
 # Pull in the Mountain discovery bits directly from that image.
 COPY --from=dtr.dev.cray.com/cray/hms-mountain-discovery:latest /requirements.txt /mountain-discovery/
