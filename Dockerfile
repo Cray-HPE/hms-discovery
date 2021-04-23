@@ -47,8 +47,8 @@ RUN set -ex \
 FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.12 AS mountain-base
 
 # Pull in the Mountain discovery bits directly from that image.
-COPY --from=dtr.dev.cray.com/cray/hms-mountain-discovery:latest /requirements.txt /mountain-discovery/
-COPY --from=dtr.dev.cray.com/cray/hms-mountain-discovery:latest /app /mountain-discovery
+COPY --from=arti.dev.cray.com/csm-docker-master-local/hms-mountain-discovery:latest /requirements.txt /mountain-discovery/
+COPY --from=arti.dev.cray.com/csm-docker-master-local/hms-mountain-discovery:latest /app /mountain-discovery
 
 RUN set -ex \
     && apk update \
