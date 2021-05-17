@@ -267,6 +267,16 @@ func doRiverDiscovery() {
 					zap.Any("unknownComponent", unknownComponent))
 			}
 
+			// Check to see if it's Redfish is endpoint is reachable.
+			reachableErr := checkBMCRedfish(unknownComponent.CompID, unknownComponent.IPAddr)
+			if reachableErr != nil {
+				logger.Warn("Redfish not reachable at IP address, not processing further!",
+					zap.Error(reachableErr),
+					zap.String("xname", unknownComponent.CompID),
+					zap.String("ipaddress", unknownComponent.IPAddr))
+				break
+			}
+
 			// ...and finally tell HSM to go discover.
 			informErr := informHSM(xname, xname, macWithoutPunctuation)
 			if informErr != nil {
