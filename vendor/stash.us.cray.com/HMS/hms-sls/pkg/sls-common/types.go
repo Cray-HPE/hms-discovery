@@ -228,7 +228,9 @@ type ComptypeRtrBmc struct {
 	IP4Addr  string `json:"IP4addr,omitempty"`
 	Username string `json:"Username,omitempty"`
 	Password string `json:"Password,omitempty"`
-} /*
+}
+
+/*
 ComptypeNodeBmc represents a comptype_nodecard, the BMC of a compute node
 */
 type ComptypeNodeBmc struct {
@@ -236,6 +238,15 @@ type ComptypeNodeBmc struct {
 	IP4Addr  string `json:"IP4addr,omitempty"`
 	Username string `json:"Username,omitempty"`
 	Password string `json:"Password,omitempty"`
+
+	Aliases []string `json:"Aliases,omitempty"`
+}
+
+/*
+ComptypeChassisBmc represents a comptype_chassis_bmc, the BMC of a chassis
+*/
+type ComptypeChassisBmc struct {
+	Aliases []string `json:"Aliases,omitempty"`
 }
 
 /*
@@ -347,15 +358,17 @@ type IPReservation struct {
 
 // IPV4Subnet is a type for managing IPv4 Subnets
 type IPV4Subnet struct {
-	FullName       string          `json:"FullName"`
-	CIDR           string          `json:"CIDR"`
-	IPReservations []IPReservation `json:"IPReservations,omitempty"`
-	Name           string          `json:"Name"`
-	VlanID         int16           `json:"VlanID"`
-	Gateway        net.IP          `json:"Gateway"`
-	DHCPStart      net.IP          `json:"DHCPStart,omitempty"`
-	DHCPEnd        net.IP          `json:"DHCPEnd,omitempty"`
-	Comment        string          `json:"Comment,omitempty"`
+	FullName         string          `json:"FullName"`
+	CIDR             string          `json:"CIDR"`
+	IPReservations   []IPReservation `json:"IPReservations,omitempty"`
+	Name             string          `json:"Name"`
+	VlanID           int16           `json:"VlanID"`
+	Gateway          net.IP          `json:"Gateway"`
+	DHCPStart        net.IP          `json:"DHCPStart,omitempty"`
+	DHCPEnd          net.IP          `json:"DHCPEnd,omitempty"`
+	Comment          string          `json:"Comment,omitempty"`
+	ReservationStart net.IP          `json:"ReservationStart,omitempty"`
+	ReservationEnd   net.IP          `json:"ReservationEnd,omitempty"`
 }
 
 type NetworkArray []Network
