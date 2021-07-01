@@ -9,10 +9,10 @@ require (
 	github.com/mitchellh/mapstructure v1.3.0
 	github.com/namsral/flag v1.7.4-pre
 	go.uber.org/zap v1.15.0
-	stash.us.cray.com/HMS/hms-base v1.12.0
-	stash.us.cray.com/HMS/hms-compcredentials v1.10.0
-	stash.us.cray.com/HMS/hms-dns-dhcp v1.4.0
-	stash.us.cray.com/HMS/hms-securestorage v1.11.0
-	stash.us.cray.com/HMS/hms-sls v1.8.1
-	stash.us.cray.com/HMS/hms-smd v1.28.0
+	stash.us.cray.com/HMS/hms-base v1.13.0
+	stash.us.cray.com/HMS/hms-compcredentials v1.11.0
+	stash.us.cray.com/HMS/hms-dns-dhcp v1.5.0
+	stash.us.cray.com/HMS/hms-securestorage v1.12.0
+	stash.us.cray.com/HMS/hms-sls v1.10.1
+	stash.us.cray.com/HMS/hms-smd v1.30.4
 )
