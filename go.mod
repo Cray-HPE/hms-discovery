@@ -1,6 +1,6 @@
 module stash.us.cray.com/HMS/hms-discovery
 
-go 1.13
+go 1.16
 
 require (
 	github.com/geoffgarside/ber v0.0.0-20181018193237-27a1aff36ce6 // indirect
