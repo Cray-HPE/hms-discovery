@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- CASMHMS-4907 - The discovery job will now checks to see if an unknown ethernet interface has Redfish before updating a MAC to giving its identify. This will prevent a situation where the EthernetInterface in HSM is given a component ID, but a Redfish Endpoint is not created.
+- CASMHMS-4907 - The discovery job will now check to see if an unknown ethernet interface has Redfish before updating the EthernetInterface in HSM to give its identify. This will prevent a situation where the EthernetInterface in HSM is given a component ID, but a Redfish Endpoint was not created for it.
 
 ## [1.7.0] - 2021-06-07
 
