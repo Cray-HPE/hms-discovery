@@ -255,6 +255,18 @@ func doRiverDiscovery() {
 			// From here on we know the xname is reachable and Redfish is responsive.
 			unknownComponent.CompID = xname
 
+			// Check to see if it's Redfish is endpoint is reachable. 
+			// If Redfish is not reachable then the EthernetInterface in HSM will remain unchanged. 
+			reachableErr := checkBMCRedfish(unknownComponent.CompID, unknownComponent.IPAddr)
+			if reachableErr != nil {
+				logger.Warn("Redfish not reachable at IP address, not processing further!",
+					zap.Error(reachableErr),
+					zap.String("xname", unknownComponent.CompID),
+					zap.String("ipaddress", unknownComponent.IPAddr),
+					zap.String("macAddress", unknownComponent.MACAddr))
+				break
+			}
+
 			// Add the new ethernet interface.
 			addErr := dhcpdnsClient.AddNewEthernetInterface(unknownComponent, true)
 
@@ -265,16 +277,6 @@ func doRiverDiscovery() {
 			} else {
 				logger.Info("Updated ethernet interface in HSM.",
 					zap.Any("unknownComponent", unknownComponent))
-			}
-
-			// Check to see if it's Redfish is endpoint is reachable.
-			reachableErr := checkBMCRedfish(unknownComponent.CompID, unknownComponent.IPAddr)
-			if reachableErr != nil {
-				logger.Warn("Redfish not reachable at IP address, not processing further!",
-					zap.Error(reachableErr),
-					zap.String("xname", unknownComponent.CompID),
-					zap.String("ipaddress", unknownComponent.IPAddr))
-				break
 			}
 
 			// ...and finally tell HSM to go discover.

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2021-07-06
+
+### Changed
+
+- CASMHMS-4907 - The discovery job will now check to see if an unknown ethernet interface has Redfish before updating the EthernetInterface in HSM to give its identify. This will prevent a situation where the EthernetInterface in HSM is given a component ID, but a Redfish Endpoint was not created for it.
+
 ## [1.6.1] - 2021-07-01
 
 ### Security
