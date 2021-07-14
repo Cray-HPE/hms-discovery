@@ -21,7 +21,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 # Build base just has the packages installed we need.
-FROM arti.dev.cray.com/baseos-docker-master-local/golang:1.14-alpine3.12 AS build-base
+FROM arti.dev.cray.com/baseos-docker-master-local/golang:1.16-alpine3.13 AS build-base
 
 RUN set -ex \
     && apk update \
@@ -29,6 +29,8 @@ RUN set -ex \
 
 # Base copies in the files we need to test/build.
 FROM build-base AS base
+
+RUN go env -w GO111MODULE=auto
 
 # Copy all the necessary files to the image.
 COPY cmd        $GOPATH/src/stash.us.cray.com/HMS/hms-discovery/cmd
@@ -44,7 +46,7 @@ RUN set -ex \
 
 
 # Stage all of the Mountain discovery stuff in advance.
-FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.12 AS mountain-base
+FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.13 AS mountain-base
 
 # Pull in the Mountain discovery bits directly from that image.
 COPY --from=arti.dev.cray.com/csm-docker-master-local/hms-mountain-discovery:latest /requirements.txt /mountain-discovery/
@@ -61,7 +63,7 @@ RUN set -ex \
 
 ## Final Stage ###
 FROM mountain-base
-LABEL maintainer="Cray, Inc."
+LABEL maintainer="Hewlett Packard Enterprise"
 
 COPY --from=builder /usr/local/bin/discovery /usr/local/bin
 ENV HSM_BASE_PATH="/hsm/v1"
