@@ -95,14 +95,15 @@ func (hts HMSStringType) String() string {
 
  */
 const (
-	CDU                  HMSStringType = "comptype_cdu"                // dD
-	CDUMgmtSwitch        HMSStringType = "comptype_cdu_mgmt_switch"    // dDwW
-	CabinetCDU           HMSStringType = "comptype_cab_cdu"            // xXdD
-	Cabinet              HMSStringType = "comptype_cabinet"            // xX
-	CabinetPDUController HMSStringType = "comptype_cab_pdu_controller" // xXmM
-	CabinetPDU           HMSStringType = "comptype_cab_pdu"            // xXmMpP
-	CabinetPDUNic        HMSStringType = "comptype_cab_pdu_nic"        // xXmMiI
-	CabinetPDUOutlet     HMSStringType = "comptype_cab_pdu_outlet"     // xXmMpPvV
+	CDU                      HMSStringType = "comptype_cdu"                   // dD
+	CDUMgmtSwitch            HMSStringType = "comptype_cdu_mgmt_switch"       // dDwW
+	CabinetCDU               HMSStringType = "comptype_cab_cdu"               // xXdD
+	Cabinet                  HMSStringType = "comptype_cabinet"               // xX
+	CabinetPDUController     HMSStringType = "comptype_cab_pdu_controller"    // xXmM
+	CabinetPDU               HMSStringType = "comptype_cab_pdu"               // xXmMpP
+	CabinetPDUNic            HMSStringType = "comptype_cab_pdu_nic"           // xXmMiI
+	CabinetPDUOutlet         HMSStringType = "comptype_cab_pdu_outlet"        // xXmMpPjJ DEPRECATED
+	CabinetPDUPowerConnector HMSStringType = "comptype_cab_pdu_pwr_connector" // xXmMpPvV
 
 	Chassis            HMSStringType = "comptype_chassis"                 // xXcC
 	ChassisBMC         HMSStringType = "comptype_chassis_bmc"             // xXcCbB
@@ -222,6 +223,11 @@ var hmsTypeHMSStringTypeTable = map[string]hmsTypeConverter{
 		"cabinetpduoutlet",
 		base.CabinetPDUOutlet,
 		CabinetPDUOutlet,
+	},
+	"cabinetpdupowerconnector": {
+		"cabinetpdupowerconnector",
+		base.CabinetPDUPowerConnector,
+		CabinetPDUPowerConnector,
 	},
 	"cec": {
 		"cec",
