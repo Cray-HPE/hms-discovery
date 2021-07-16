@@ -1,4 +1,4 @@
-NAME ?= cray-hms-discovery
+NAME ?= hms-discovery
 VERSION ?= $(shell cat .version)
 
 # Helm Chart
