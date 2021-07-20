@@ -11,7 +11,7 @@ pipeline {
     }
 
     environment {
-        NAME = "cray-hms-discovery"
+        NAME = "hms-discovery"
         DESCRIPTION = "Cray HMS Discovery"
         IS_STABLE = getBuildIsStable()
         VERSION = getDockerBuildVersion(isStable: env.IS_STABLE)
