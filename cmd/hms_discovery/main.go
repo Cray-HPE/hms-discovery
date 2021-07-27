@@ -38,14 +38,14 @@ import (
 	"github.com/namsral/flag"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	compcredentials "stash.us.cray.com/HMS/hms-compcredentials"
-	"stash.us.cray.com/HMS/hms-discovery/internal/http_logger"
-	"stash.us.cray.com/HMS/hms-discovery/pkg/pdu_credential_store"
-	"stash.us.cray.com/HMS/hms-discovery/pkg/switches"
-	dns_dhcp "stash.us.cray.com/HMS/hms-dns-dhcp/pkg"
-	securestorage "stash.us.cray.com/HMS/hms-securestorage"
-	rf "stash.us.cray.com/HMS/hms-smd/pkg/redfish"
-	"stash.us.cray.com/HMS/hms-smd/pkg/sm"
+	compcredentials "github.com/Cray-HPE/hms-compcredentials"
+	"github.com/Cray-HPE/hms-discovery/internal/http_logger"
+	"github.com/Cray-HPE/hms-discovery/pkg/pdu_credential_store"
+	"github.com/Cray-HPE/hms-discovery/pkg/switches"
+	dns_dhcp "github.com/Cray-HPE/hms-dns-dhcp/pkg"
+	securestorage "github.com/Cray-HPE/hms-securestorage"
+	rf "github.com/Cray-HPE/hms-smd/pkg/redfish"
+	"github.com/Cray-HPE/hms-smd/pkg/sm"
 )
 
 var (

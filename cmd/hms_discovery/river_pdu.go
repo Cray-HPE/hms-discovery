@@ -26,8 +26,8 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
-	"stash.us.cray.com/HMS/hms-discovery/pkg/pdu_credential_store"
-	"stash.us.cray.com/HMS/hms-smd/pkg/sm"
+	"github.com/Cray-HPE/hms-discovery/pkg/pdu_credential_store"
+	"github.com/Cray-HPE/hms-smd/pkg/sm"
 )
 
 func informRTS(xname, fqdn, macWithoutPunctuation string, unknownComponent sm.CompEthInterface) error {
