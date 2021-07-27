@@ -32,7 +32,7 @@ import (
 
 /*
 The Mountain discovery logic is already nice self contained here:
-https://stash.us.cray.com/projects/HMS/repos/hms-mountain-discovery/browse
+https://github.com/Cray-HPE/hms-mountain-discovery
 
 No point in re-doing all that fine work. Thusly this utility expects to have those bits available for running. In a
 production setting this is accomplished by the Docker image literally coping those files from that image. In a
