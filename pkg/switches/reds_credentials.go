@@ -24,7 +24,7 @@ package switches
 
 import (
 	"fmt"
-	securestorage "stash.us.cray.com/HMS/hms-securestorage"
+	securestorage "github.com/Cray-HPE/hms-securestorage"
 )
 
 /*
