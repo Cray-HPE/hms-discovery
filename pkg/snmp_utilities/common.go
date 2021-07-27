@@ -26,7 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/k-sone/snmpgo"
-	"stash.us.cray.com/HMS/hms-discovery/pkg/switches"
+	"github.com/Cray-HPE/hms-discovery/pkg/switches"
 	"strconv"
 	"strings"
 )
