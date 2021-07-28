@@ -33,24 +33,25 @@ FROM build-base AS base
 RUN go env -w GO111MODULE=auto
 
 # Copy all the necessary files to the image.
-COPY cmd        $GOPATH/src/stash.us.cray.com/HMS/hms-discovery/cmd
-COPY internal   $GOPATH/src/stash.us.cray.com/HMS/hms-discovery/internal
-COPY pkg        $GOPATH/src/stash.us.cray.com/HMS/hms-discovery/pkg
-COPY vendor     $GOPATH/src/stash.us.cray.com/HMS/hms-discovery/vendor
+COPY cmd        $GOPATH/src/github.com/Cray-HPE/hms-discovery/cmd
+COPY internal   $GOPATH/src/github.com/Cray-HPE/hms-discovery/internal
+COPY pkg        $GOPATH/src/github.com/Cray-HPE/hms-discovery/pkg
+COPY vendor     $GOPATH/src/github.com/Cray-HPE/hms-discovery/vendor
 
 ### Build Stage ###
 FROM base AS builder
 
 RUN set -ex \
-    && go build -v -o /usr/local/bin/discovery stash.us.cray.com/HMS/hms-discovery/cmd/hms_discovery
+    && go build -v -o /usr/local/bin/discovery github.com/Cray-HPE/hms-discovery/cmd/hms_discovery
 
 
 # Stage all of the Mountain discovery stuff in advance.
 FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.13 AS mountain-base
 
 # Pull in the Mountain discovery bits directly from that image.
-COPY --from=arti.dev.cray.com/csm-docker-master-local/hms-mountain-discovery:latest /requirements.txt /mountain-discovery/
-COPY --from=arti.dev.cray.com/csm-docker-master-local/hms-mountain-discovery:latest /app /mountain-discovery
+# TODO: Update this with 'latest' tag when available in algol60
+COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.5.0 /requirements.txt /mountain-discovery/
+COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.5.0 /app /mountain-discovery
 
 RUN set -ex \
     && apk update \
