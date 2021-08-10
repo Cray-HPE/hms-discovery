@@ -24,7 +24,7 @@
 FROM arti.dev.cray.com/baseos-docker-master-local/golang:1.16-alpine3.13 AS build-base
 
 RUN set -ex \
-    && apk update \
+    && apk -U upgrade \
     && apk add build-base
 
 # Base copies in the files we need to test/build.
@@ -54,7 +54,7 @@ COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.5
 COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.5.0 /app /mountain-discovery
 
 RUN set -ex \
-    && apk update \
+    && apk -U upgrade \
     && apk add \
         python3 \
         py3-pip \
@@ -71,7 +71,7 @@ ENV HSM_BASE_PATH="/hsm/v1"
 ENV MOUNTAIN_DISCOVERY_SCRIPT="/mountain-discovery/mountain_discovery.py"
 
 RUN set -ex \
-    && apk update \
+    && apk -U upgrade \
     && apk add --no-cache \
         curl
 
