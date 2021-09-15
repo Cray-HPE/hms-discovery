@@ -75,4 +75,7 @@ RUN set -ex \
     && apk add --no-cache \
         curl
 
+# nobody 65534:65534
+USER 65534:65534
+
 CMD ["sh", "-c", "discovery"]
