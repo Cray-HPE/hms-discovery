@@ -22,8 +22,8 @@ spec:
         spec:
           containers:
             - name: hms-discovery
-              imagePullPolicy: Always
-              image: "{{ include "cray-hms-discovery.image-prefix" . }}cray/hms-discovery:{{ include "cray-hms-discovery.imageTag" . }}"
+              image: {{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
               env:
                 - name: SLS_URL
                   value: "http://cray-sls"
@@ -42,4 +42,8 @@ spec:
                   value: "true"
                 - name: VAULT_BASE_PATH
                   value: "secret"
+              securityContext:
+                runAsUser: 65534
+                runAsGroup: 65534
+                runAsNonRoot: true
           restartPolicy: Never
