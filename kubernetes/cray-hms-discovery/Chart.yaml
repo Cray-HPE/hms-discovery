@@ -1,4 +1,17 @@
-apiVersion: v1
-description: "Kubernetes resources for cray-hms-discovery"
+apiVersion: v2
 name: "cray-hms-discovery"
 version: 1.8.0
+description: "Kubernetes resources for cray-hms-discovery"
+home:  "https://github.com/Cray-HPE/hms-discovery"
+sources:
+  - "https://github.com/Cray-HPE/hms-discovery"
+maintainers:
+  - name: Hardware Management
+    url: https://github.com/orgs/Cray-HPE/teams/hardware-management
+appVersion: "1.8.0"
+annotations:
+  artifacthub.io/images: |
+    - name: cray-hms-discovery
+      image: artifactory.algol60.net/csm-docker/stable/hms-discovery:1.8.0
+
+

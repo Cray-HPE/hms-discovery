@@ -1,1 +1,3 @@
-imagesHost: "dtr.dev.cray.com"
+image:
+  repository: artifactory.algol60.net/csm-docker/stable/hms-discovery
+  pullPolicy: IfNotPresent
