@@ -50,8 +50,8 @@ FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.13 AS mountain-base
 
 # Pull in the Mountain discovery bits directly from that image.
 # TODO: Update this with 'latest' tag when available in algol60
-COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.5.0 /requirements.txt /mountain-discovery/
-COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.5.0 /app /mountain-discovery
+COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.6.0 /requirements.txt /mountain-discovery/
+COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.6.0 /app /mountain-discovery
 
 RUN set -ex \
     && apk -U upgrade \
