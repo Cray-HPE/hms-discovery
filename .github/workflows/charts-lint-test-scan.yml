@@ -1,0 +1,20 @@
+name: Lint, test, and scan Helm charts
+on:
+  pull_request:
+    branches:
+      - master
+      - release/**
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+jobs:
+  lint-test-scan:
+    uses: Cray-HPE/.github/.github/workflows/charts-lint-test-scan.yml@main
+    with:
+      ct-flags: --chart-dirs kubernetes --target-branch $GITHUB_BASE_REF
+      ct-lint-flags: --all
+      ct-test-flags: --chart-repos https://artifactory.algol60.net/artifactory/csm-helm-charts/
+      lint-and-test: ${{ github.event_name == 'pull_request' }}
+    secrets:
+      snyk-token: ${{ secrets.SNYK_TOKEN }}
+

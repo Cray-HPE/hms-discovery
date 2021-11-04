@@ -1,3 +1,3 @@
 {{/*
-Add helper methods here for your chart
+Add helper methods here
 */}}
