@@ -42,8 +42,8 @@ spec:
                   value: "true"
                 - name: VAULT_BASE_PATH
                   value: "secret"
+              securityContext:
+                runAsUser: 65534
+                runAsGroup: 65534
+                runAsNonRoot: true
           restartPolicy: Never
-          securityContext:
-            runAsUser: 65534
-            runAsGroup: 65534
-            runAsNonRoot: true
