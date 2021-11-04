@@ -1,8 +1,5 @@
 name: Lint, test, and scan Helm charts
 on:
-  push:
-    branches:
-      - casm-2670*
   pull_request:
     branches:
       - master
@@ -15,7 +12,7 @@ jobs:
     uses: Cray-HPE/.github/.github/workflows/charts-lint-test-scan.yml@main
     with:
       ct-flags: --chart-dirs kubernetes --target-branch $GITHUB_BASE_REF
-      ct-lint-flags: --all
+      ct-lint-flags: --all --validate-maintainers false
     secrets:
       snyk-token: ${{ secrets.SNYK_TOKEN }}
 
