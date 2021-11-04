@@ -1,5 +1,8 @@
 name: Lint, test, and scan Helm charts
 on:
+  push:
+    branches:
+      - casm-2670*
   pull_request:
     branches:
       - master
