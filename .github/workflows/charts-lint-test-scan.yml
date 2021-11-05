@@ -15,6 +15,7 @@ jobs:
       ct-config: |
         chart-dirs:
           - kubernetes
+        target-branch: $GITHUB_BASE_REF
         validate-maintainers: false
       scan-image-snyk-args: "--severity-threshold=high"
     secrets:
