@@ -16,7 +16,8 @@ jobs:
         chart-dirs:
           - kubernetes
         validate-maintainers: false
-      scan-image-snyk-args: "--severity-threshold=high"
+      scan-chart-snyk-args: "--severity-threshold=high"
+      scan-images: false
     secrets:
       snyk-token: ${{ secrets.SNYK_TOKEN }}
 
