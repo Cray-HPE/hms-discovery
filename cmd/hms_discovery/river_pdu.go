@@ -24,11 +24,17 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
-	"go.uber.org/zap"
 	"github.com/Cray-HPE/hms-discovery/pkg/pdu_credential_store"
 	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 )
+
+var pduUnknown = 0
+var pduRedfish = 1
+var pduRTS = 2
 
 func informRTS(xname, fqdn, macWithoutPunctuation string, unknownComponent sm.CompEthInterface) error {
 	// Get Default Credentails for the PDU
@@ -72,4 +78,53 @@ func informRTS(xname, fqdn, macWithoutPunctuation string, unknownComponent sm.Co
 	)
 
 	return nil
+}
+
+func getPDUType(unknownComponent sm.CompEthInterface) (pduType int, err error) {
+	err = nil
+	pduType = pduUnknown
+	// Get Default Credentails for the PDU
+	defaultCreds, err := pduCredentialStore.GetDefaultPDUCredentails()
+	if err != nil {
+		return pduType, fmt.Errorf("failed to get default PDU credentials: %w", err)
+	}
+
+	jawsURL := fmt.Sprintf("https://%s/jaws/config/info/system", unknownComponent.IPAddr)
+	request, requestErr := retryablehttp.NewRequest("GET", jawsURL, nil)
+	if requestErr != nil {
+		logger.Error("failed to make request", zap.Error(requestErr))
+	} else {
+		request.SetBasicAuth(defaultCreds.Username, defaultCreds.Password)
+
+		response, doErr := httpClient.Do(request)
+		if doErr != nil {
+			logger.Error("failed to execute GET request", zap.Error(doErr))
+		} else if response.StatusCode == http.StatusOK {
+			pduType = pduRTS
+		}
+	}
+	defaultCredentials, credsErr := redsCredentialStore.GetDefaultCredentials()
+	if credsErr != nil {
+		logger.Error("failed to make request", zap.Error(credsErr))
+		return
+	}
+	redfishURL := fmt.Sprintf("https://%s/redfish/v1", unknownComponent.IPAddr)
+	request, requestErr = retryablehttp.NewRequest("GET", redfishURL, nil)
+	if requestErr != nil {
+		logger.Error("failed to make request", zap.Error(requestErr))
+		return
+	}
+
+	request.SetBasicAuth(defaultCredentials["Cray"].Username, defaultCredentials["Cray"].Password)
+
+	response, doErr := httpClient.Do(request)
+	if doErr != nil {
+		logger.Error("failed to execute GET request", zap.Error(doErr))
+		return
+	}
+
+	if response.StatusCode == http.StatusOK {
+		pduType = pduRedfish
+	}
+	return
 }
