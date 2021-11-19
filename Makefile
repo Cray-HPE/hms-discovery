@@ -23,11 +23,6 @@
 NAME ?= hms-discovery
 VERSION ?= $(shell cat .version)
 
-# Helm Chart
-CHART_PATH ?= kubernetes
-CHART_NAME ?= cray-hms-discovery
-CHART_VERSION ?= $(shell cat .version)
-
 all: image 
 
 image:
