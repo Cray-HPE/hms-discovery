@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for HPE PDUs
 
+## [1.9.0] - 2021-11-03
+
+### Fixed
+
+- Pick up new mountain discovery script that ignores disabled components
+
+## [1.8.0] - 2021-10-29
+
+### Changed
+
+- bumped semver to adhere to semver standard
+
 ## [1.7.7] - 2021-09-08
 
 ### Changed
