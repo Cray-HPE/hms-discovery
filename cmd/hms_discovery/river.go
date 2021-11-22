@@ -344,25 +344,32 @@ func checkBMCRedfish(xname string, fqdn string) (err error) {
 			zap.String("xname", xname), zap.Error(credsErr))
 	}
 
-	redfishURL := fmt.Sprintf("https://%s/redfish/v1", fqdn)
+	var redfishURLs []string
+	redfishURLs = append(redfishURLs, fmt.Sprintf("https://%s/redfish/v1", fqdn))
+	redfishURLs = append(redfishURLs, fmt.Sprintf("https://%s/redfish/v1/", fqdn))
 
-	//req.SetBasicAuth(request.Auth.Username, request.Auth.Password)
-	request, requestErr := retryablehttp.NewRequest("GET", redfishURL, nil)
-	if requestErr != nil {
-		err = fmt.Errorf("failed to make request: %w", requestErr)
-		return
-	}
-	request.SetBasicAuth(creds.Username, creds.Password)
+	for _, redfishURL := range redfishURLs {
 
-	response, doErr := httpClient.Do(request)
-	if doErr != nil {
-		err = fmt.Errorf("failed to execute GET request: %w", doErr)
-		return
-	}
+		//req.SetBasicAuth(request.Auth.Username, request.Auth.Password)
+		request, requestErr := retryablehttp.NewRequest("GET", redfishURL, nil)
+		if requestErr != nil {
+			err = fmt.Errorf("failed to make request: %w", requestErr)
+			continue
+		}
+		request.SetBasicAuth(creds.Username, creds.Password)
 
-	if response.StatusCode != http.StatusOK {
-		err = fmt.Errorf("unexpected status code from Redfish: %d", response.StatusCode)
-		return
+		response, doErr := httpClient.Do(request)
+		if doErr != nil {
+			err = fmt.Errorf("failed to execute GET request: %w", doErr)
+			continue
+		}
+
+		if response.StatusCode != http.StatusOK {
+			err = fmt.Errorf("unexpected status code from Redfish: %d", response.StatusCode)
+			continue
+		} else {
+			return
+		}
 	}
 
 	return
