@@ -32,9 +32,11 @@ import (
 	"go.uber.org/zap"
 )
 
-var pduUnknown = 0
-var pduRedfish = 1
-var pduRTS = 2
+const (
+	pduUnknown = iota
+	pduRedfish
+	pduRTS
+)
 
 func informRTS(xname, fqdn, macWithoutPunctuation string, unknownComponent sm.CompEthInterface) error {
 	// Get Default Credentails for the PDU
@@ -89,7 +91,7 @@ func getPDUType(unknownComponent sm.CompEthInterface) (pduType int, err error) {
 		return pduType, fmt.Errorf("failed to get default PDU credentials: %w", err)
 	}
 
-	jawsURL := fmt.Sprintf("https://%s/jaws/config/info/system", unknownComponent.IPAddr)
+	jawsURL := fmt.Sprintf("https://%s/jaws", unknownComponent.IPAddr)
 	request, requestErr := retryablehttp.NewRequest("GET", jawsURL, nil)
 	if requestErr != nil {
 		logger.Error("failed to make request", zap.Error(requestErr))
@@ -99,8 +101,9 @@ func getPDUType(unknownComponent sm.CompEthInterface) (pduType int, err error) {
 		response, doErr := httpClient.Do(request)
 		if doErr != nil {
 			logger.Error("failed to execute GET request", zap.Error(doErr))
-		} else if response.StatusCode == http.StatusOK {
+		} else if response.StatusCode < 400 {
 			pduType = pduRTS
+			return
 		}
 	}
 	defaultCredentials, credsErr := redsCredentialStore.GetDefaultCredentials()
