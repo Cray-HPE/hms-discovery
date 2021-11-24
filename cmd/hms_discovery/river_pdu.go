@@ -91,7 +91,7 @@ func getPDUType(unknownComponent sm.CompEthInterface) (pduType int, err error) {
 		return pduType, fmt.Errorf("failed to get default PDU credentials: %w", err)
 	}
 
-	jawsURL := fmt.Sprintf("https://%s/jaws", unknownComponent.IPAddr)
+	jawsURL := fmt.Sprintf("https://%s/jaws/config/info/system", unknownComponent.IPAddr)
 	request, requestErr := retryablehttp.NewRequest("GET", jawsURL, nil)
 	if requestErr != nil {
 		logger.Error("failed to make request", zap.Error(requestErr))
@@ -101,7 +101,7 @@ func getPDUType(unknownComponent sm.CompEthInterface) (pduType int, err error) {
 		response, doErr := httpClient.Do(request)
 		if doErr != nil {
 			logger.Error("failed to execute GET request", zap.Error(doErr))
-		} else if response.StatusCode < 400 {
+		} else if response.StatusCode == http.StatusOK {
 			pduType = pduRTS
 			return
 		}
