@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2021-11-19
+
+### Added
+
+- Support for HPE PDUs
+
 ## [1.9.0] - 2021-11-03
 
 ### Fixed
@@ -16,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - bumped semver to adhere to semver standard
-
 
 ## [1.7.7] - 2021-09-08
 
@@ -107,7 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.6] - 2020-11-18
 
 ### Changed
-- CASMINST-332: Fail gracefully when unable to communicate with a management switch. If a communication problem occurs with a management switch it will be ignored, and the discovery job will continue to try to communicate with the other switches. 
+- CASMINST-332: Fail gracefully when unable to communicate with a management switch. If a communication problem occurs with a management switch it will be ignored, and the discovery job will continue to try to communicate with the other switches.
 - Removed workaround for CASMHMS-3617, we no longer need to delete ethernet interface entries in SMD when updating component IDs.
 
 ## [1.2.5] - 2020-10-20

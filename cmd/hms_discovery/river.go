@@ -31,9 +31,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/mitchellh/mapstructure"
-	"go.uber.org/zap"
 	base "github.com/Cray-HPE/hms-base"
 	compcredentials "github.com/Cray-HPE/hms-compcredentials"
 	"github.com/Cray-HPE/hms-discovery/pkg/snmp_utilities"
@@ -41,6 +38,9 @@ import (
 	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
 	rf "github.com/Cray-HPE/hms-smd/pkg/redfish"
 	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/mitchellh/mapstructure"
+	"go.uber.org/zap"
 )
 
 const VaultPrefix = "vault://"
@@ -204,34 +204,45 @@ func doRiverDiscovery() {
 				// only one switch will have the correct port mapping that corresponds to what SLS has.
 				continue
 			}
+			logger.Info("msg", zap.String("Xname", xname))
 
 			// If we've made it here we know exactly what this BMC is. Therefore any failure from this point on will
 			// be treated as "fatal" for this device rather than just a continue.
 
 			if base.GetHMSType(xname) == base.CabinetPDUController {
-				// ServerTech PDUs are discovered differently then other types of hardware, as they do no talk native Redfish.
-				// TODO: In the future when we have PDU's that support redfish, we need to inform HSM instead of RTS
+				pduType, _ := getPDUType(unknownComponent)
+				switch pduType {
+				case pduRTS:
+					logger.Info("Found RTS PDU", zap.String("xname", xname))
+					// ServerTech PDUs are discovered differently then other types of hardware, as they do not talk native Redfish.
+					if informErr := informRTS(xname, xname, macWithoutPunctuation, unknownComponent); informErr != nil {
+						logger.Error("Failed to notify RTS about PDU!",
+							zap.Error(informErr),
+							zap.String("xname", xname),
+						)
 
-				if informErr := informRTS(xname, xname, macWithoutPunctuation, unknownComponent); informErr != nil {
-					logger.Error("Failed to notify RTS about PDU!",
-						zap.Error(informErr),
+						failedXnames = append(failedXnames, xname)
+						break
+					}
+
+					logger.Info("Successfully identified and informed RTS about PDU.",
 						zap.String("xname", xname),
+						zap.String("managementSwitchXname", managementSwitchXname),
+						zap.String("port", port),
 					)
 
-					failedXnames = append(failedXnames, xname)
+					globallyFound = true
+					discoveredXnames = append(discoveredXnames, xname)
+
+					break
+				case pduRedfish:
+					logger.Info("Found Redfish PDU", zap.String("xname", xname))
+					// Redfish PDU continue with discovery
+				default:
+					// Could not figure out what this is, continue with loop
+					logger.Error("PDU Type Unknown", zap.String("xname", xname))
 					break
 				}
-
-				logger.Info("Successfully identified and informed RTS about PDU.",
-					zap.String("xname", xname),
-					zap.String("managementSwitchXname", managementSwitchXname),
-					zap.String("port", port),
-				)
-
-				globallyFound = true
-				discoveredXnames = append(discoveredXnames, xname)
-
-				break
 			}
 
 			// Put the creds in Vault.
@@ -255,8 +266,8 @@ func doRiverDiscovery() {
 			// From here on we know the xname is reachable and Redfish is responsive.
 			unknownComponent.CompID = xname
 
-			// Check to see if it's Redfish is endpoint is reachable. 
-			// If Redfish is not reachable then the EthernetInterface in HSM will remain unchanged. 
+			// Check to see if it's Redfish is endpoint is reachable.
+			// If Redfish is not reachable then the EthernetInterface in HSM will remain unchanged.
 			reachableErr := checkBMCRedfish(unknownComponent.CompID, unknownComponent.IPAddr)
 			if reachableErr != nil {
 				logger.Warn("Redfish not reachable at IP address, not processing further!",
@@ -330,25 +341,32 @@ func checkBMCRedfish(xname string, fqdn string) (err error) {
 			zap.String("xname", xname), zap.Error(credsErr))
 	}
 
-	redfishURL := fmt.Sprintf("https://%s/redfish/v1/", fqdn)
+	var redfishURLs []string
+	redfishURLs = append(redfishURLs, fmt.Sprintf("https://%s/redfish/v1", fqdn))
+	redfishURLs = append(redfishURLs, fmt.Sprintf("https://%s/redfish/v1/", fqdn))
 
-	//req.SetBasicAuth(request.Auth.Username, request.Auth.Password)
-	request, requestErr := retryablehttp.NewRequest("GET", redfishURL, nil)
-	if requestErr != nil {
-		err = fmt.Errorf("failed to make request: %w", requestErr)
-		return
-	}
-	request.SetBasicAuth(creds.Username, creds.Password)
+	for _, redfishURL := range redfishURLs {
 
-	response, doErr := httpClient.Do(request)
-	if doErr != nil {
-		err = fmt.Errorf("failed to execute GET request: %w", doErr)
-		return
-	}
+		//req.SetBasicAuth(request.Auth.Username, request.Auth.Password)
+		request, requestErr := retryablehttp.NewRequest("GET", redfishURL, nil)
+		if requestErr != nil {
+			err = fmt.Errorf("failed to make request: %w", requestErr)
+			continue
+		}
+		request.SetBasicAuth(creds.Username, creds.Password)
 
-	if response.StatusCode != http.StatusOK {
-		err = fmt.Errorf("unexpected status code from Redfish: %d", response.StatusCode)
-		return
+		response, doErr := httpClient.Do(request)
+		if doErr != nil {
+			err = fmt.Errorf("failed to execute GET request: %w", doErr)
+			continue
+		}
+
+		if response.StatusCode != http.StatusOK {
+			err = fmt.Errorf("unexpected status code from Redfish: %d", response.StatusCode)
+			continue
+		} else {
+			return nil
+		}
 	}
 
 	return
