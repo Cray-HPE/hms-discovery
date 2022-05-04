@@ -1,6 +1,6 @@
 # MIT License
 #
-# (C) Copyright 2021 Hewlett Packard Enterprise Development LP
+# (C) Copyright [2021-2022] Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,10 @@
 NAME ?= hms-discovery
 VERSION ?= $(shell cat .version)
 
-all: image 
+all: image snyk
 
 image:
 	docker build ${NO_CACHE} --pull ${DOCKER_ARGS} --tag '${NAME}:${VERSION}' .
+
+snyk:
+	./runSnyk.sh

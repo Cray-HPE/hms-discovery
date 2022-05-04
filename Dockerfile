@@ -1,6 +1,6 @@
 # MIT License
 #
-# (C) Copyright [2020-2021] Hewlett Packard Enterprise Development LP
+# (C) Copyright [2020-2022] Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,7 +21,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 # Build base just has the packages installed we need.
-FROM arti.dev.cray.com/baseos-docker-master-local/golang:1.16-alpine3.13 AS build-base
+FROM artifactory.algol60.net/docker.io/library/golang:1.16-alpine AS build-base
 
 RUN set -ex \
     && apk -U upgrade \
@@ -46,7 +46,7 @@ RUN set -ex \
 
 
 # Stage all of the Mountain discovery stuff in advance.
-FROM arti.dev.cray.com/baseos-docker-master-local/alpine:3.13 AS mountain-base
+FROM artifactory.algol60.net/docker.io/alpine:3.15 AS mountain-base
 
 # Pull in the Mountain discovery bits directly from that image.
 # TODO: Update this with 'latest' tag when available in algol60
