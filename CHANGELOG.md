@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated hms-discovery to build using GitHub Actions instead of Jenkins.
 - Pull images from artifactory.algol60.net instead of arti.dev.cray.com.
-- Stop building CT test RPMs as part of the migration to Helm test.
 
 ## [1.10.0] - 2021-11-19
 
