@@ -1,6 +1,6 @@
 // MIT License
 //
-// (C) Copyright [2020-2021] Hewlett Packard Enterprise Development LP
+// (C) Copyright [2020-2022] Hewlett Packard Enterprise Development LP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -164,7 +164,7 @@ func doRiverDiscovery() {
 	// Keep track of the xnames we successfully and unsuccessfully process.
 	var discoveredXnames []string
 	var failedXnames []string
-	var remainingUnknownComponents []sm.CompEthInterface
+	var remainingUnknownComponents []sm.CompEthInterfaceV2
 
 	// Finally we can process all of the unknown hardware.
 	for _, unknownComponent := range unknownComponents {
@@ -268,12 +268,12 @@ func doRiverDiscovery() {
 
 			// Check to see if it's Redfish is endpoint is reachable.
 			// If Redfish is not reachable then the EthernetInterface in HSM will remain unchanged.
-			reachableErr := checkBMCRedfish(unknownComponent.CompID, unknownComponent.IPAddr)
+			reachableErr := checkBMCRedfish(unknownComponent.CompID, unknownComponent.IPAddrs[0].IPAddr)
 			if reachableErr != nil {
 				logger.Warn("Redfish not reachable at IP address, not processing further!",
 					zap.Error(reachableErr),
 					zap.String("xname", unknownComponent.CompID),
-					zap.String("ipaddress", unknownComponent.IPAddr),
+					zap.String("ipaddress", unknownComponent.IPAddrs[0].IPAddr),
 					zap.String("macAddress", unknownComponent.MACAddr))
 				break
 			}

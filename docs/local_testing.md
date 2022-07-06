@@ -36,30 +36,30 @@ The MAC address for uan01 is `b42e993b7030`. So we need to add a blank ethernet 
 ```json
 {
     "MACAddress": "b4:2e:99:3b:70:30",
-    "IPAddress": "10.252.0.34",
+    "IPAddresses": [{"IPAddress": "10.252.0.34"}],
     "Description": "UAN"
 }
 ```
 
 ```
 $ curl -i -X POST -H "Content-Type: application/json" \
-  -d '{"MACAddress":"b4:2e:99:3b:70:30", "IPAddress":"10.252.0.34", "Description": "UAN - Login" }' \
-  http://localhost:27779/hsm/v1/Inventory/EthernetInterfaces
+  -d '{"MACAddress":"b4:2e:99:3b:70:30", "IPAddresses":[{"IPAddress":"10.252.0.34"}], "Description": "UAN - Login" }' \
+  http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces
 ```
 
 Lets add the PDU to the ethernet interfaces table, and the PDU's MAC address is `000a9c62202e`:
 ```json
 {
     "MACAddress": "000a9c62202e",
-    "IPAddress": "10.252.0.10",
+    "IPAddresses": [{"IPAddress": "10.252.0.10"}],
     "Description": "PDU"
 }
 ```
 
 ```
 curl -i -X POST -H "Content-Type: application/json" \
-  -d '{"MACAddress":"000a9c62202e", "IPAddress":"10.252.0.10", "Description": "PDU" }' \
-  http://localhost:27779/hsm/v1/Inventory/EthernetInterfaces
+  -d '{"MACAddress":"000a9c62202e", "IPAddresses":[{"IPAddress":"10.252.0.10"}], "Description": "PDU" }' \
+  http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces
 ```
 
 ## Running Discovery
@@ -81,15 +81,15 @@ LOG_LEVEL=DEBUG"
 ## Resetting Env
 The easiest way to reset the environment for another run of the discovery job is to clear out SMD, and re-adding the unknown components back into the ethernet interfaces table in SMD:
 ``` 
-curl -X DELETE 'http://localhost:27779/hsm/v1/Inventory/EthernetInterfaces'
-curl -X DELETE 'http://localhost:27779/hsm/v1/Inventory/RedfishEndpoints'
-curl -X DELETE 'http://localhost:27779/hsm/v1/State/Components'
+curl -X DELETE 'http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces'
+curl -X DELETE 'http://localhost:27779/hsm/v2/Inventory/RedfishEndpoints'
+curl -X DELETE 'http://localhost:27779/hsm/v2/State/Components'
 
 curl -i -X POST -H "Content-Type: application/json" \
-  -d '{"MACAddress":"b42e993b7030", "IPAddress":"10.252.0.34", "Description": "UAN - Login" }' \
-  http://localhost:27779/hsm/v1/Inventory/EthernetInterfaces
+  -d '{"MACAddress":"b42e993b7030", "IPAddresses":[{"IPAddress":"10.252.0.34"}], "Description": "UAN - Login" }' \
+  http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces
 
 curl -i -X POST -H "Content-Type: application/json" \
-  -d '{"MACAddress":"000a9c62202e", "IPAddress":"10.252.0.10", "Description": "PDU" }' \
-  http://localhost:27779/hsm/v1/Inventory/EthernetInterfaces
+  -d '{"MACAddress":"000a9c62202e", "IPAddresses":[{"IPAddress":"10.252.0.10"}], "Description": "PDU" }' \
+  http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces
 ```

@@ -1,6 +1,6 @@
 // MIT License
 //
-// (C) Copyright [2020-2021] Hewlett Packard Enterprise Development LP
+// (C) Copyright [2020-2022] Hewlett Packard Enterprise Development LP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -38,7 +38,7 @@ const (
 	pduRTS
 )
 
-func informRTS(xname, fqdn, macWithoutPunctuation string, unknownComponent sm.CompEthInterface) error {
+func informRTS(xname, fqdn, macWithoutPunctuation string, unknownComponent sm.CompEthInterfaceV2) error {
 	// Get Default Credentails for the PDU
 	defaultCreds, err := pduCredentialStore.GetDefaultPDUCredentails()
 	if err != nil {
@@ -82,7 +82,7 @@ func informRTS(xname, fqdn, macWithoutPunctuation string, unknownComponent sm.Co
 	return nil
 }
 
-func getPDUType(unknownComponent sm.CompEthInterface) (pduType int, err error) {
+func getPDUType(unknownComponent sm.CompEthInterfaceV2) (pduType int, err error) {
 	err = nil
 	pduType = pduUnknown
 	// Get Default Credentails for the PDU
@@ -91,7 +91,7 @@ func getPDUType(unknownComponent sm.CompEthInterface) (pduType int, err error) {
 		return pduType, fmt.Errorf("failed to get default PDU credentials: %w", err)
 	}
 
-	jawsURL := fmt.Sprintf("https://%s/jaws/config/info/system", unknownComponent.IPAddr)
+	jawsURL := fmt.Sprintf("https://%s/jaws/config/info/system", unknownComponent.IPAddrs[0].IPAddr)
 	request, requestErr := retryablehttp.NewRequest("GET", jawsURL, nil)
 	if requestErr != nil {
 		logger.Error("failed to make request", zap.Error(requestErr))
@@ -111,7 +111,7 @@ func getPDUType(unknownComponent sm.CompEthInterface) (pduType int, err error) {
 		logger.Error("failed to make request", zap.Error(credsErr))
 		return
 	}
-	redfishURL := fmt.Sprintf("https://%s/redfish/v1", unknownComponent.IPAddr)
+	redfishURL := fmt.Sprintf("https://%s/redfish/v1", unknownComponent.IPAddrs[0].IPAddr)
 	request, requestErr = retryablehttp.NewRequest("GET", redfishURL, nil)
 	if requestErr != nil {
 		logger.Error("failed to make request", zap.Error(requestErr))

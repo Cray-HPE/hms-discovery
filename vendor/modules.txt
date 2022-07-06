@@ -6,7 +6,7 @@ github.com/Cray-HPE/hms-certs/pkg/hms_certs
 # github.com/Cray-HPE/hms-compcredentials v1.11.2
 ## explicit
 github.com/Cray-HPE/hms-compcredentials
-# github.com/Cray-HPE/hms-dns-dhcp v1.5.2
+# github.com/Cray-HPE/hms-dns-dhcp v1.6.0
 ## explicit
 github.com/Cray-HPE/hms-dns-dhcp/pkg
 # github.com/Cray-HPE/hms-securestorage v1.12.2

@@ -67,7 +67,7 @@ FROM mountain-base
 LABEL maintainer="Hewlett Packard Enterprise"
 
 COPY --from=builder /usr/local/bin/discovery /usr/local/bin
-ENV HSM_BASE_PATH="/hsm/v1"
+ENV HSM_BASE_PATH="/hsm/v2"
 ENV MOUNTAIN_DISCOVERY_SCRIPT="/mountain-discovery/mountain_discovery.py"
 
 RUN set -ex \

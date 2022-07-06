@@ -1,6 +1,6 @@
 // MIT License
 //
-// (C) Copyright [2020-2021] Hewlett Packard Enterprise Development LP
+// (C) Copyright [2020-2022] Hewlett Packard Enterprise Development LP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -209,7 +209,7 @@ func main() {
 	// Parse the arguments.
 	flag.Parse()
 
-	*hsmURL = *hsmURL + "/hsm/v1"
+	*hsmURL = *hsmURL + "/hsm/v2"
 
 	setupLogging()
 
