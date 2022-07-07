@@ -59,6 +59,8 @@ github.com/Cray-HPE/hms-dns-dhcp v1.5.0 h1:ldk+aUULi/mUif2/G6y4y61Vkcq0L+KliMkdQ
 github.com/Cray-HPE/hms-dns-dhcp v1.5.0/go.mod h1:I/dHpmcvJFimeEI7bZxxLBMdqi+suVs/0kqVPDlVmzU=
 github.com/Cray-HPE/hms-dns-dhcp v1.5.2 h1:O/NMxUWy3zHGu1tYTyjNBa3MU5iSlKwJA01mR5AfO2w=
 github.com/Cray-HPE/hms-dns-dhcp v1.5.2/go.mod h1:F5EyKyAD88Q+Mlc8N3YNUiY/hCfJDDtNyVF4MgN1h80=
+github.com/Cray-HPE/hms-dns-dhcp v1.6.0 h1:m7yarg1Pju8ya9gkaATW7v1lcsMJFcDHCwNKwqkmYh4=
+github.com/Cray-HPE/hms-dns-dhcp v1.6.0/go.mod h1:F5EyKyAD88Q+Mlc8N3YNUiY/hCfJDDtNyVF4MgN1h80=
 github.com/Cray-HPE/hms-go-http-lib v1.4.0/go.mod h1:eJFHFY3OmoLhTTauAaaUtKGl0+4XdpIRTXokvNVRFJU=
 github.com/Cray-HPE/hms-go-http-lib v1.5.0/go.mod h1:jOhxzTUxjfXhPsv4L95fvJH8JgaMtWkBpppx972rmoQ=
 github.com/Cray-HPE/hms-go-http-lib v1.5.3/go.mod h1:BKlB4HKAGW5GgS3x01y7zxxYFLaJM2byACUunmes2z8=

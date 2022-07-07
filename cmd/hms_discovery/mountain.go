@@ -1,6 +1,6 @@
 // MIT License
 //
-// (C) Copyright [2021] Hewlett Packard Enterprise Development LP
+// (C) Copyright [2021-2022] Hewlett Packard Enterprise Development LP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -46,7 +46,7 @@ func doMountainDiscovery() {
 	command.Env = append(os.Environ(),
 		"HSM_PROTOCOL=http://",
 		"HSM_HOST_WITH_PORT=cray-smd",
-		"HSM_BASE_PATH=/hsm/v1",
+		"HSM_BASE_PATH=/hsm/v2",
 		"SLS_PROTOCOL=http://",
 		"SLS_HOST_WITH_PATH=cray-sls",
 		"CAPMC_PROTOCOL=http://",
