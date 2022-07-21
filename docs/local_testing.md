@@ -2,19 +2,25 @@
 
 ## Bringup Test Containers
 1. Startup the required Docker containers (do this in the root of this repo):
-  - `$ docker-compose -f docker-compose.devel.yaml up`
+
+  ```bash
+    $ docker-compose -f docker-compose.devel.yaml up
+    ```
 2. Load SLS file into SLS:
-  - `$ curl -X POST -F sls_dump=@configs/slsTestConfig.json http://localhost:8376/v1/loadstate`
+    
+    ```bash
+    $ curl -X POST -F sls_dump=@configs/slsTestConfig.json http://localhost:8376/v1/loadstate
+    ```
 
 ## Manually Adding in Default Credentials
 Exec into the vault container, and login to vault:
-```
+```bash
 $ docker exec -it hms-discovery_vault_1 sh
 / # vault login hms
 ```
 ### REDS
 Load in the credentials into `reds-creds`:
-```
+```bash
 / # echo '{
     "Cray": {
         "Username": "root",
@@ -26,7 +32,7 @@ Load in the credentials into `reds-creds`:
 ```
 ### PDUs
 Load in the default PDU Credentials
-```
+```bash
 / # vault kv put pdu-creds/global/rts username=root password=rts
 / # vault kv put pdu-creds/global/pdu username=root password=pdu
 ```
@@ -41,7 +47,7 @@ The MAC address for uan01 is `b42e993b7030`. So we need to add a blank ethernet 
 }
 ```
 
-```
+```bash
 $ curl -i -X POST -H "Content-Type: application/json" \
   -d '{"MACAddress":"b4:2e:99:3b:70:30", "IPAddresses":[{"IPAddress":"10.252.0.34"}], "Description": "UAN - Login" }' \
   http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces
@@ -56,7 +62,7 @@ Lets add the PDU to the ethernet interfaces table, and the PDU's MAC address is 
 }
 ```
 
-```
+```bash
 curl -i -X POST -H "Content-Type: application/json" \
   -d '{"MACAddress":"000a9c62202e", "IPAddresses":[{"IPAddress":"10.252.0.10"}], "Description": "PDU" }' \
   http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces
@@ -64,23 +70,23 @@ curl -i -X POST -H "Content-Type: application/json" \
 
 ## Running Discovery
 The following environment variables are required to be set for Discovery to run properly:
-```
-SLS_URL=http://localhost:8376
-HSM_URL=http://localhost:27779
-CRAY_VAULT_AUTH_PATH=auth/token/create
-CRAY_VAULT_ROLE_FILE=configs/namespace
-CRAY_VAULT_JWT_FILE=configs/token
-VAULT_ADDR=http://localhost:8200
-VAULT_TOKEN=hms
-SNMP_MODE=MOCK
-DISCOVER_MOUNTAIN=false
-DISCOVER_RIVER=true
-LOG_LEVEL=DEBUG"
+```bash
+export SLS_URL=http://localhost:8376
+export HSM_URL=http://localhost:27779
+export CRAY_VAULT_AUTH_PATH=auth/token/create
+export CRAY_VAULT_ROLE_FILE=configs/namespace
+export CRAY_VAULT_JWT_FILE=configs/token
+export VAULT_ADDR=http://localhost:8200
+export VAULT_TOKEN=hms
+export SNMP_MODE=MOCK
+export DISCOVER_MOUNTAIN=false
+export DISCOVER_RIVER=true
+export LOG_LEVEL=DEBUG
 ```
 
 ## Resetting Env
 The easiest way to reset the environment for another run of the discovery job is to clear out SMD, and re-adding the unknown components back into the ethernet interfaces table in SMD:
-``` 
+```bash
 curl -X DELETE 'http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces'
 curl -X DELETE 'http://localhost:27779/hsm/v2/Inventory/RedfishEndpoints'
 curl -X DELETE 'http://localhost:27779/hsm/v2/State/Components'
