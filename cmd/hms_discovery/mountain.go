@@ -23,11 +23,14 @@
 package main
 
 import (
-	"go.uber.org/zap"
+	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 /*
@@ -42,19 +45,39 @@ development setting I would recommend checking out that repo and referencing tha
 var mountainLoggingRegex = regexp.MustCompile(`.+-([A-Z]+)-(.+)`)
 
 func doMountainDiscovery() {
-	command := exec.Command("python3", *mountainDiscoveryScript)
-	command.Env = append(os.Environ(),
-		"HSM_PROTOCOL=http://",
-		"HSM_HOST_WITH_PORT=cray-smd",
+	hsmURLParsed, err := url.Parse(*hsmURL)
+	if err != nil {
+		logger.Fatal("Failed to parse HSM URL", zap.Stringp("hsmURL", hsmURL), zap.Error(err))
+	}
+
+	slsURLParsed, err := url.Parse(*slsURL)
+	if err != nil {
+		logger.Fatal("Failed to parse SLS URL", zap.Stringp("slsURL", slsURL), zap.Error(err))
+	}
+
+	capmcURLParsed, err := url.Parse(*capmcURL)
+	if err != nil {
+		logger.Fatal("Failed to parse CAPMC URL", zap.Stringp("capmcURL", capmcURL), zap.Error(err))
+	}
+
+	configEnvVariables := []string{
+		fmt.Sprintf("HSM_PROTOCOL=%s://", hsmURLParsed.Scheme),
+		fmt.Sprintf("HSM_HOST_WITH_PORT=%s", hsmURLParsed.Host),
 		"HSM_BASE_PATH=/hsm/v2",
-		"SLS_PROTOCOL=http://",
-		"SLS_HOST_WITH_PATH=cray-sls",
-		"CAPMC_PROTOCOL=http://",
-		"CAPMC_HOST_WITH_PORT=cray-capmc",
+		fmt.Sprintf("SLS_PROTOCOL=%s://", slsURLParsed.Scheme),
+		fmt.Sprintf("SLS_HOST_WITH_PATH=%s", slsURLParsed.Host),
+		fmt.Sprintf("CAPMC_PROTOCOL=%s://", capmcURLParsed.Scheme),
+		fmt.Sprintf("CAPMC_HOST_WITH_PORT=%s", capmcURLParsed.Host),
 		"CAPMC_BASE_PATH=/capmc/v1",
 		"SLEEP_LENGTH=30",
 		"FEATURE_FLAG_SLS=False",
-	)
+	}
+
+	logger.Debug("Configuration environment variables being supplied to mountain_discovery.py", zap.Strings("configEnvVariables", configEnvVariables))
+
+	command := exec.Command("python3", *mountainDiscoveryScript)
+	command.Env = append(os.Environ(), configEnvVariables...)
+
 	output, err := command.CombinedOutput()
 
 	mountainLogger := logger.With(zap.String("source", "mountain_helper"))

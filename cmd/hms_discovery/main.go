@@ -34,10 +34,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/namsral/flag"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	compcredentials "github.com/Cray-HPE/hms-compcredentials"
 	"github.com/Cray-HPE/hms-discovery/internal/http_logger"
 	"github.com/Cray-HPE/hms-discovery/pkg/pdu_credential_store"
@@ -46,6 +42,10 @@ import (
 	securestorage "github.com/Cray-HPE/hms-securestorage"
 	rf "github.com/Cray-HPE/hms-smd/pkg/redfish"
 	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/namsral/flag"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var (
@@ -53,6 +53,8 @@ var (
 		"System Layout Service URL")
 	hsmURL = flag.String("hsm_url", "http://cray-smd",
 		"State Manager URL")
+	capmcURL = flag.String("capmc_url", "http://cray-capmc",
+		"CAPMC URL")
 
 	discoverRiver = flag.Bool("discover_river", true, "Discover River nodes?")
 
