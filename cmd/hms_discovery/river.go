@@ -31,13 +31,13 @@ import (
 	"os"
 	"strings"
 
-	base "github.com/Cray-HPE/hms-base"
 	compcredentials "github.com/Cray-HPE/hms-compcredentials"
 	"github.com/Cray-HPE/hms-discovery/pkg/snmp_utilities"
 	"github.com/Cray-HPE/hms-discovery/pkg/switches"
-	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
+	sls_common "github.com/Cray-HPE/hms-sls/v2/pkg/sls-common"
 	rf "github.com/Cray-HPE/hms-smd/pkg/redfish"
 	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	"github.com/Cray-HPE/hms-xname/xnametypes"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/mitchellh/mapstructure"
 	"go.uber.org/zap"
@@ -209,7 +209,7 @@ func doRiverDiscovery() {
 			// If we've made it here we know exactly what this BMC is. Therefore any failure from this point on will
 			// be treated as "fatal" for this device rather than just a continue.
 
-			if base.GetHMSType(xname) == base.CabinetPDUController {
+			if xnametypes.GetHMSType(xname) == xnametypes.CabinetPDUController {
 				pduType, _ := getPDUType(unknownComponent)
 				switch pduType {
 				case pduRTS:
