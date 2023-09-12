@@ -63,7 +63,8 @@ var (
 	mountainDiscoveryScript = flag.String("mountain_discovery_script", "mountain_discovery.py",
 		"Location of the script to give Python to run for Mountain discovery.")
 
-	discoverVirtualNodes             = flag.Bool("discover_virtual_nodes", true, "Discover Virtual nodes")
+	discoverManagementVirtualNodes   = flag.Bool("discover_management_virtual_nodes", true, "Discover Management Virtual nodes")
+	discoverManagementNodes          = flag.Bool("discover_management_nodes", true, "Discover Management Nodes")
 	rediscoverFailedRedfishEndpoints = flag.Bool("rediscover_failed_redfish_endpoints", true, "Rediscover Failed Redfish Endpoints")
 
 	httpClient *retryablehttp.Client
@@ -238,7 +239,8 @@ func main() {
 		zap.String("hsmURL", *hsmURL),
 		zap.Bool("discoverRiver", *discoverRiver),
 		zap.Bool("discoverMountain", *discoverMountain),
-		zap.Bool("discoverVirtualNodes", *discoverVirtualNodes),
+		zap.Bool("discoverManagementVirtualNodes", *discoverManagementVirtualNodes),
+		zap.Bool("discoverManagementNodes", *discoverManagementNodes),
 		zap.String("atomicLevel", atomicLevel.String()),
 	)
 
@@ -254,9 +256,15 @@ func main() {
 		}
 	}
 
-	if *discoverVirtualNodes {
+	if *discoverManagementVirtualNodes {
 		if err := doManagementVirtualNodeDiscovery(context.Background()); err != nil {
 			logger.With(zap.Error(err)).Error("Failed to discover Management VirtualNodes")
+		}
+	}
+
+	if *discoverManagementNodes {
+		if err := doManagementNodeDiscovery(context.Background()); err != nil {
+			logger.With(zap.Error(err)).Error("Failed to discover Management Nodes")
 		}
 	}
 

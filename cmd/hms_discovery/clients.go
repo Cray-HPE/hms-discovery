@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	base "github.com/Cray-HPE/hms-base"
 	sls_common "github.com/Cray-HPE/hms-sls/v2/pkg/sls-common"
@@ -13,12 +14,26 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 )
 
+func buildRequestURL(baseURL, path string, params map[string]string) string {
+	url := fmt.Sprintf("%s/%s", baseURL, path)
+	if len(params) > 0 {
+		paramStrings := []string{}
+		for key, value := range params {
+			paramStrings = append(paramStrings, fmt.Sprintf("%s=%s", key, value))
+		}
+
+		url = fmt.Sprintf("%s?%s", url, strings.Join(paramStrings, "&"))
+	}
+
+	return url
+}
+
 //
 // SLS
 //
 
-func getSLSManagementVirtualNodes(ctx context.Context) (map[string]sls_common.GenericHardware, error) {
-	url := fmt.Sprintf("%s/v1/search/hardware?type=comptype_virtual_node&extra_properties.Role=Management", *slsURL)
+func getSLSSearchHardware(ctx context.Context, params map[string]string) (map[string]sls_common.GenericHardware, error) {
+	url := buildRequestURL(*slsURL, "v1/search/hardware", params)
 
 	req, err := retryablehttp.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -53,8 +68,9 @@ func getSLSManagementVirtualNodes(ctx context.Context) (map[string]sls_common.Ge
 // HSM
 //
 
-func getHSManagementVirtualNodes(ctx context.Context) (map[string]base.Component, error) {
-	url := fmt.Sprintf("%s/State/Components?Type=VirtualNode&Role=Management", *hsmURL)
+func getHSMStateComponents(ctx context.Context, params map[string]string) (map[string]base.Component, error) {
+	url := buildRequestURL(*hsmURL, "State/Components", params)
+
 	req, err := retryablehttp.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("failed to build GET request"), err)
