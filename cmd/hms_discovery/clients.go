@@ -10,9 +10,12 @@ import (
 
 	base "github.com/Cray-HPE/hms-base"
 	sls_common "github.com/Cray-HPE/hms-sls/v2/pkg/sls-common"
+	rf "github.com/Cray-HPE/hms-smd/pkg/redfish"
 	"github.com/Cray-HPE/hms-xname/xnametypes"
 	"github.com/hashicorp/go-retryablehttp"
 )
+
+var ErrNotFound = fmt.Errorf("not found")
 
 func buildRequestURL(baseURL, path string, params map[string]string) string {
 	url := fmt.Sprintf("%s/%s", baseURL, path)
@@ -140,4 +143,46 @@ func postHSMStateComponent(ctx context.Context, component base.Component) error 
 	}
 
 	return nil
+}
+
+func getHSMInventoryRedfishEndpoint(ctx context.Context, xname string) (rf.RedfishEPDescription, error) {
+	if !xnametypes.IsHMSCompIDValid(xname) {
+		return rf.RedfishEPDescription{}, fmt.Errorf("invalid component ID (%s)", xname)
+	}
+
+	url := fmt.Sprintf("%s/Inventory/RedfishEndpoints/%s", *hsmURL, xname)
+	req, err := retryablehttp.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return rf.RedfishEPDescription{}, errors.Join(fmt.Errorf("failed to build GET request"), err)
+	}
+
+	// base.SetHTTPUserAgent(request, sc.instanceName)
+
+	response, err := httpClient.Do(req)
+	if err != nil {
+		return rf.RedfishEPDescription{}, errors.Join(fmt.Errorf("failed to perform GET request against HSM"), err)
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		// If HSM sends back a response, then we should read the contents of the body so the Istio sidecar doesn't fill up
+		var responseString string
+		if response.Body != nil {
+			responseRaw, _ := io.ReadAll(response.Body)
+			responseString = string(responseRaw)
+		}
+
+		if response.StatusCode == 404 {
+			return rf.RedfishEPDescription{}, ErrNotFound
+		} else if response.StatusCode != 200 {
+			return rf.RedfishEPDescription{}, fmt.Errorf("unexpected status code %d expected 200: %s", response.StatusCode, responseString)
+		}
+	}
+
+	var result rf.RedfishEPDescription
+	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
+		return rf.RedfishEPDescription{}, err
+	}
+
+	return result, nil
 }
