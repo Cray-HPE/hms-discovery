@@ -66,6 +66,7 @@ var (
 	discoverManagementVirtualNodes   = flag.Bool("discover_management_virtual_nodes", true, "Discover Management Virtual nodes")
 	discoverManagementNodes          = flag.Bool("discover_management_nodes", true, "Discover Management Nodes")
 	rediscoverFailedRedfishEndpoints = flag.Bool("rediscover_failed_redfish_endpoints", true, "Rediscover Failed Redfish Endpoints")
+	managementSwitchCredentials      = flag.Bool("management_switch_credentials", true, "Handle management switch credentials")
 
 	httpClient *retryablehttp.Client
 
@@ -241,6 +242,7 @@ func main() {
 		zap.Bool("discoverMountain", *discoverMountain),
 		zap.Bool("discoverManagementVirtualNodes", *discoverManagementVirtualNodes),
 		zap.Bool("discoverManagementNodes", *discoverManagementNodes),
+		zap.Bool("managementSwitchCredentials", *managementSwitchCredentials),
 		zap.String("atomicLevel", atomicLevel.String()),
 	)
 
@@ -265,6 +267,12 @@ func main() {
 	if *discoverManagementNodes {
 		if err := doManagementNodeDiscovery(context.Background()); err != nil {
 			logger.With(zap.Error(err)).Error("Failed to discover Management Nodes")
+		}
+	}
+
+	if *managementSwitchCredentials {
+		if err := doManagementSwitchCredentials(context.Background()); err != nil {
+			logger.With(zap.Error(err)).Error("Failed to handle Management Switch credentials") // TODO handle wording
 		}
 	}
 
