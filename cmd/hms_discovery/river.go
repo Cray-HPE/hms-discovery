@@ -233,15 +233,12 @@ func doRiverDiscovery() {
 
 					globallyFound = true
 					discoveredXnames = append(discoveredXnames, xname)
-
-					break
 				case pduRedfish:
 					logger.Info("Found Redfish PDU", zap.String("xname", xname))
 					// Redfish PDU continue with discovery
 				default:
 					// Could not figure out what this is, continue with loop
 					logger.Error("PDU Type Unknown", zap.String("xname", xname))
-					break
 				}
 			}
 

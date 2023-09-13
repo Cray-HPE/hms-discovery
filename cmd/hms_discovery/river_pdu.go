@@ -83,9 +83,8 @@ func informRTS(xname, fqdn, macWithoutPunctuation string, unknownComponent sm.Co
 }
 
 func getPDUType(unknownComponent sm.CompEthInterfaceV2) (pduType int, err error) {
-	err = nil
 	pduType = pduUnknown
-	// Get Default Credentails for the PDU
+	// Get Default Credentials for the PDU
 	defaultCreds, err := pduCredentialStore.GetDefaultPDUCredentails()
 	if err != nil {
 		return pduType, fmt.Errorf("failed to get default PDU credentials: %w", err)
