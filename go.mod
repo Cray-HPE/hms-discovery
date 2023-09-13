@@ -3,6 +3,7 @@ module github.com/Cray-HPE/hms-discovery
 go 1.16
 
 require (
+	github.com/Cray-HPE/hms-base v1.15.0
 	github.com/Cray-HPE/hms-compcredentials v1.11.2
 	github.com/Cray-HPE/hms-dns-dhcp v1.6.0
 	github.com/Cray-HPE/hms-securestorage v1.12.2

@@ -1,4 +1,5 @@
 # github.com/Cray-HPE/hms-base v1.15.0
+## explicit
 github.com/Cray-HPE/hms-base
 # github.com/Cray-HPE/hms-certs v1.3.2
 github.com/Cray-HPE/hms-certs/pkg/hms_certs

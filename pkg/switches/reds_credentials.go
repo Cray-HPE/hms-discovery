@@ -23,7 +23,9 @@
 package switches
 
 import (
+	"errors"
 	"fmt"
+
 	securestorage "github.com/Cray-HPE/hms-securestorage"
 )
 
@@ -37,7 +39,7 @@ type RedsCredStore struct {
 }
 
 type SwitchCredentials struct {
-	SNMPUsername string
+	SNMPUsername     string
 	SNMPAuthPassword string
 	SNMPPrivPassword string
 }
@@ -65,6 +67,8 @@ func NewRedsCredStore(keyPath string, ss securestorage.SecureStorage) *RedsCredS
 	return ccs
 }
 
+// GetDefaultCredentials retrieves a map of default credentials, keyed by vendor,
+// from a secure credentials store.
 func (ccs *RedsCredStore) GetDefaultCredentials() (map[string]RedsCredentials, error) {
 	credMapRtn := make(map[string]RedsCredentials)
 	err := ccs.SS.Lookup(ccs.CCPath+"/defaults", &credMapRtn)
@@ -72,8 +76,29 @@ func (ccs *RedsCredStore) GetDefaultCredentials() (map[string]RedsCredentials, e
 	return credMapRtn, err
 }
 
+// StoreDefaultCredentials stores a map of default credentials, keyed by vendor.
+func (ccs *RedsCredStore) StoreDefaultCredentials(credentials map[string]RedsCredentials) error {
+	err := ccs.SS.Store(ccs.CCPath+"/defaults", credentials)
+
+	if err != nil {
+		return errors.New("unable to store default credentials: " + err.Error())
+	}
+	return nil
+}
+
+// StoreDefaultCredentials stores a map of default credentials, keyed by vendor.
 func (ccs *RedsCredStore) GetDefaultSwitchCredentials() (credentials SwitchCredentials, err error) {
 	err = ccs.SS.Lookup(ccs.CCPath+"/switch_defaults", &credentials)
 
 	return
+}
+
+// StoreDefaultCredentials stores a map of default credentials, keyed by vendor.
+func (ccs *RedsCredStore) StoreDefaultSwitchCredentials(credentials SwitchCredentials) error {
+	err := ccs.SS.Store(ccs.CCPath+"/switch_defaults", credentials)
+
+	if err != nil {
+		return errors.New("unable to store default switch credentials: " + err.Error())
+	}
+	return nil
 }
