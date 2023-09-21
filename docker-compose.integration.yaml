@@ -1,0 +1,201 @@
+version: '3.7'
+
+networks:
+  sim:
+
+services:
+  # wait-for-smd:
+  #   build:
+  #     context: test/ct/
+  #     dockerfile: Dockerfile.wait-for-smd.Dockerfile
+  #   depends_on:
+  #     - cray-smd
+  #     - cray-hms-hmcollector
+  #     - cray-hmnfd
+  #     - vault-kv-enabler
+  #     - emulator-loader
+  #   networks:
+  #     - sim
+  # wait-for-smd:
+  #   image: artifactory.algol60.net/csm-docker/stable/docker.io/curlimages/curl:7.81.0
+  #   command: ["sh", "arg"]
+  # tavern-reset-env:
+  #   build:
+  #     context: test/
+  #     dockerfile: Dockerfile
+  #   # entrypoint: entrypoint.sh tavern -c /src/app/tavern_global_config_ct_test.yaml -p /src/app/api
+  #   networks:
+  #     - sim
+  #   profiles:
+  #     - do-not-start-automatically
+  # smoke-tests:
+  #   build:
+  #     context: test/ct/
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - cray-smd
+  #   entrypoint: entrypoint.sh smoke -f smoke.json -u http://cray-sim:27779
+  #   networks:
+  #     - sim
+  vault:
+    hostname: vault
+    image: artifactory.algol60.net/docker.io/library/vault:1.5.5
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=hms
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+      - VAULT_ADDR=http://127.0.0.1:8200
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - sim
+  vault-kv-enabler:
+    image: artifactory.algol60.net/csm-docker/stable/vault-kv-enabler:1.18.0
+    environment:
+      - VAULT_ADDR=http://vault:8200
+      - VAULT_TOKEN=hms
+      - KV_STORES=secret
+    depends_on:
+      - vault
+    networks:
+      - sim
+  #
+  # SLS
+  #
+  cray-sls-postgres:
+    hostname: sls-postgres
+    image: artifactory.algol60.net/docker.io/library/postgres:11-alpine
+    environment:
+      - POSTGRES_USER=slsuser
+      - POSTGRES_DB=sls
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "54321:5432"
+    networks:
+      - sim
+  cray-sls-init:
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.3.0
+    command: ["sls-init"]
+    environment:
+      - POSTGRES_HOST=sls-postgres
+      - DBOPTS=sslmode=disable
+      - DBUSER=slsuser
+    depends_on:
+      - cray-sls-postgres
+    networks:
+      - sim
+  cray-sls:
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.3.0
+    environment:
+      - POSTGRES_HOST=cray-sls-postgres
+      - DBOPTS=sslmode=disable
+      - DBUSER=slsuser
+      - CRAY_VAULT_AUTH_PATH=auth/token/create
+      - CRAY_VAULT_ROLE_FILE=configs/namespace
+      - CRAY_VAULT_JWT_FILE=configs/token
+      - VAULT_ADDR=http://vault:8200
+      - VAULT_TOKEN=hms
+      - VAULT_KEYPATH=secret/hms-creds
+    ports:
+      - "8376:8376"
+    depends_on:
+      - cray-sls-postgres
+      - cray-sls-init
+    networks:
+      - sim
+
+  #
+  # HSM
+  #
+  hmsds-postgres:
+    hostname: hmsds-postgres
+    image: artifactory.algol60.net/docker.io/library/postgres:11-alpine
+    environment:
+      - POSTGRES_PASSWORD=hmsdsuser
+      - POSTGRES_USER=hmsdsuser
+      - POSTGRES_DB=hmsds
+    networks:
+      - sim
+  cray-smd-init:
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.13.0	
+    command: /entrypoint.sh smd-init
+    environment:
+      - SMD_DBHOST=hmsds-postgres
+      - SMD_DBPORT=5432
+    depends_on:
+      - hmsds-postgres
+    networks:
+      - sim
+  cray-smd:
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.13.0	
+    environment:
+      - POSTGRES_HOST=hmsds-postgres
+      - POSTGRES_PORT=5432
+      - RF_MSG_HOST=
+      - CRAY_VAULT_AUTH_PATH=auth/token/create
+      - CRAY_VAULT_ROLE_FILE=configs/namespace
+      - CRAY_VAULT_JWT_FILE=configs/token
+      - VAULT_ADDR=http://vault:8200
+      - VAULT_TOKEN=hms
+      - VAULT_KEYPATH=secret/hms-creds
+      - SMD_WVAULT=true
+      - SMD_RVAULT=true
+      - SMD_SLS_HOST=http://cray-sls:8376/v1
+      - SMD_HBTD_HOST=
+    hostname: cray-smd
+    depends_on:
+      - cray-smd-init
+      - vault
+      - cray-sls
+    networks:
+      - sim
+    ports:
+      - "27779:27779"
+
+ 
+  #
+  # RIE
+  #
+  rfemulator0:
+    hostname: x0c0s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
+    environment:
+      - MOCKUPFOLDER=DL325
+      - XNAME=x0c0s1b0
+      - PORT=443
+    networks:
+      sim:
+        aliases:
+          - x0c0s1b0
+  rfemulator1:
+    hostname: x0c0s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
+    environment:
+      - MOCKUPFOLDER=DL325
+      - XNAME=x0c0s2b0
+      - PORT=443
+    networks:
+      sim:
+        aliases:
+          - x0c0s2b0
+  rfemulator2:
+    hostname: x0c0s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
+    environment:
+      - MOCKUPFOLDER=DL325
+      - XNAME=x0c0s3b0
+      - PORT=443
+    networks:
+      sim:
+        aliases:
+          - x0c0s3b0
+  rfemulator3:
+    hostname: x0c0s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
+    environment:
+      - MOCKUPFOLDER=DL325
+      - XNAME=x0c0s4b0
+      - PORT=443
+    networks:
+      sim:
+        aliases:
+          - x0c0s4b0
