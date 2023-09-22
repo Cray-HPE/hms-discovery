@@ -4,39 +4,6 @@ networks:
   sim:
 
 services:
-  # wait-for-smd:
-  #   build:
-  #     context: test/ct/
-  #     dockerfile: Dockerfile.wait-for-smd.Dockerfile
-  #   depends_on:
-  #     - cray-smd
-  #     - cray-hms-hmcollector
-  #     - cray-hmnfd
-  #     - vault-kv-enabler
-  #     - emulator-loader
-  #   networks:
-  #     - sim
-  # wait-for-smd:
-  #   image: artifactory.algol60.net/csm-docker/stable/docker.io/curlimages/curl:7.81.0
-  #   command: ["sh", "arg"]
-  # tavern-reset-env:
-  #   build:
-  #     context: test/
-  #     dockerfile: Dockerfile
-  #   # entrypoint: entrypoint.sh tavern -c /src/app/tavern_global_config_ct_test.yaml -p /src/app/api
-  #   networks:
-  #     - sim
-  #   profiles:
-  #     - do-not-start-automatically
-  # smoke-tests:
-  #   build:
-  #     context: test/ct/
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - cray-smd
-  #   entrypoint: entrypoint.sh smoke -f smoke.json -u http://cray-sim:27779
-  #   networks:
-  #     - sim
   vault:
     hostname: vault
     image: artifactory.algol60.net/docker.io/library/vault:1.5.5
@@ -46,6 +13,8 @@ services:
       - VAULT_ADDR=http://127.0.0.1:8200
     cap_add:
       - IPC_LOCK
+    ports:
+      - 8200:8200
     networks:
       - sim
   vault-kv-enabler:

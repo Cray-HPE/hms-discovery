@@ -1,0 +1,164 @@
+---
+test_name: Populate SLS with management switches
+
+stages:
+  - name: Populate x3000c0w10 in SLS
+    request:
+      url: "{sls_base_url}/v1/hardware/x3000c0w10"
+      method: PUT
+      json:
+        xname: x3000c0w11
+        class: River
+        ExtraProperties:
+          Aliases:
+          - "sw-leaf-bmc-001"
+          Brand: "Aruba"
+          IP4addr: 10.254.0.4
+          SNMPAuthPassword: "vault://hms-creds/x3000c0w10"
+          SNMPAuthProtocol: "MD5"
+          SNMPPrivPassword: "vault://hms-creds/x3000c0w10"
+          SNMPPrivProtocol: "DES"
+          SNMPUsername: "user-x3000c0w10"
+    response:
+      status_code:
+      - 200
+      - 201
+  - name: Populate x3000c0w11 in SLS
+    request:
+      url: "{sls_base_url}/v1/hardware/x3000c0w11"
+      method: PUT
+      json:
+        xname: x3000c0w11
+        class: River
+        ExtraProperties:
+          Aliases:
+          - "sw-leaf-bmc-002"
+          Brand: "Aruba"
+          IP4addr: 10.254.0.5
+          SNMPAuthPassword: "vault://hms-creds/x3000c0w11"
+          SNMPAuthProtocol: "MD5"
+          SNMPPrivPassword: "vault://hms-creds/x3000c0w11"
+          SNMPPrivProtocol: "DES"
+          SNMPUsername: "user-x3000c0w11"
+    response:
+      status_code:
+      - 200
+      - 201
+  - name: Populate x3000c0h33s1 in SLS
+    request:
+      url: "{sls_base_url}/v1/hardware/x3000c0h33s1"
+      method: PUT
+      json:
+        xname: x3000c0h33s1
+        class: River
+        ExtraProperties:
+          Aliases:
+          - "sw-spine-001"
+          Brand: "Aruba"
+          IP4addr: 10.254.0.5
+    response:
+      status_code:
+      - 200
+      - 201
+  - name: Populate x3000c0h33s2 in SLS
+    request:
+      url: "{sls_base_url}/v1/hardware/x3000c0h33s2"
+      method: PUT
+      json:
+        xname: x3000c0h33s2
+        class: River
+        ExtraProperties:
+          Aliases:
+          - "sw-spine-002"
+          Brand: "Aruba"
+          IP4addr: 10.254.0.6
+    response:
+      status_code:
+      - 200
+      - 201
+  - name: Populate d0w1 in SLS
+    request:
+      url: "{sls_base_url}/v1/hardware/d0w1"
+      method: PUT
+      json:
+        xname: d0w1
+        class: River
+        ExtraProperties:
+          Aliases:
+          - "sw-cdu-001"
+          Brand: "Aruba"
+    response:
+      status_code:
+      - 200
+      - 201
+  - name: Populate d0w2 in SLS
+    request:
+      url: "{sls_base_url}/v1/hardware/d0w2"
+      method: PUT
+      json:
+        xname: d0w2
+        class: River
+        ExtraProperties:
+          Aliases:
+          - "sw-cdu-002"
+          Brand: "Aruba"
+    response:
+      status_code:
+      - 200
+      - 201
+---
+test_name: Remove existing credentials from Vault
+
+marks:
+- parametrize:
+    key: xname
+    vals:
+
+    # Switches new
+    - x3000c0w10
+    - x3000c0h33s1
+    - d0w1
+
+stages:
+  - name: Remove per device credential from Vault
+    request:
+      url: "{vault_base_url}/v1/secret/hms-creds/{xname}"
+      method: DELETE
+      verify: false
+      headers:
+        X-Vault-Request: "true"
+        X-Vault-Token: hms
+    response:
+      status_code: 204
+
+---
+test_name: "Populate per-device credentials for existing switches in Vault"
+marks:
+- parametrize:
+    key:
+    - xname
+    - snmp_username
+    - snmn_auth_password
+    - smnp_priv_password
+    vals:
+    # Switches existing
+    - [x3000c0w11,   user-x3000c0w11,   auth-x3000c0w11,   priv-x3000c0w11]
+    - [x3000c0h33s2, user-x3000c0h33s2, auth-x3000c0h33s2, priv-x3000c0h33s2]
+    - [d0w2,         user-d0w2,         auth-d0w2,         priv-d0w2]
+
+stages:
+  - name: Populate per-device credential in Vault
+    request:
+      url: "{vault_base_url}/v1/secret/hms-creds/{xname}"
+      method: POST
+      verify: false
+      headers:
+        X-Vault-Request: "true"
+        X-Vault-Token: hms
+      json:
+        Xname: "{xname}"
+        Username: "{snmp_username}"
+        SNMPAuthPass: "{snmn_auth_password}"
+        SNMPPrivPass: "{smnp_priv_password}"
+    response:
+      status_code: 204

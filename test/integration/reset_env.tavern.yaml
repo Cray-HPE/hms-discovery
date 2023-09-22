@@ -1,5 +1,5 @@
 ---
-test_name: Reset Vault 
+test_name: Populate default credentials into Vault 
 stages:
   - name: Push in global default redfish credentials
     request:

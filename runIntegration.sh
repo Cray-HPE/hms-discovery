@@ -54,23 +54,43 @@ function run_tavern_test() {
         "hms-discovery-test:${COMPOSE_PROJECT_NAME}" \
         tavern \
             -c /src/app/integration/tavern_global_config.yaml \
-             -p "/src/app/integration/${1}"
-
+            -p "/src/app/integration/${1}"
+    if [[ "$?" -ne 0 ]]; then
+        echo "Failed, tavern reported non-zero exit code"
+        exit 1
+    fi
 }
 
-# function run_discovery() {
-#      docker run --rm --network "${COMPOSE_PROJECT_NAME}_sim" \
-#         "hms-discovery:${COMPOSE_PROJECT_NAME}" \
-#         tavern \
-#             -c /src/app/integration/tavern_global_config.yaml \
-#              -p "/src/app/integration/${1}"
-# }
+function run_discovery() {
+    docker run --rm --network "${COMPOSE_PROJECT_NAME}_sim" \
+        -e SLS_URL=http://cray-sls:8376 \
+        -e HSM_URL=http://cray-smd:27779 \
+        -e CAPMC_URL=http://cray-capmc:27777 \
+        -e CRAY_VAULT_AUTH_PATH=auth/token/create \
+        -e CRAY_VAULT_ROLE_FILE=configs/namespace \
+        -e CRAY_VAULT_JWT_FILE=configs/token \
+        -e VAULT_ADDR=http://vault:8200 \
+        -e VAULT_TOKEN=hms \
+        -e VAULT_BASE_PATH=secret \
+        -e SNMP_MODE=MOCK \
+        -e DISCOVER_MOUNTAIN="true" \
+        -e DISCOVER_RIVER="true" \
+        -e LOG_LEVEL=DEBUG \
+        -v "$(realpath configs):/configs" \
+        "hms-discovery:${COMPOSE_PROJECT_NAME}"
+
+    if [[ "$?" -ne 0 ]]; then
+        echo "Failed, tavern reported non-zero exit code"
+        exit 1
+    fi
+}
+ 
 
 #
 # Build hms-discovery image
 #
 echo "Building service image"
-if ! docker build ./test -t "hms-discovery:${COMPOSE_PROJECT_NAME}"; then
+if ! docker build . -t "hms-discovery:${COMPOSE_PROJECT_NAME}"; then
     echo "Failed to build service image" 
     exit 1
 fi
@@ -112,17 +132,25 @@ for i in {0..120}; do
     sleep 1
 done
 
-docker compose logs vault-kv-enabler
+for setup_test in ./test/integration/scenarios/*.setup.tavern.yaml; do
+    setup_test="$(basename "${setup_test}")"
 
-for test in foo bar; do
-    echo "Running test ${test}"
-
-    #  run reset env tavern script (or maybe just do it via tavern) to reset env
+    # Run reset env tavern script (or maybe just do it via tavern) to reset env
+    echo "Resting test environment"
     run_tavern_test reset_env.tavern.yaml
-    #  
-    #  run test setup tavern test
-    #  
-    #  run hms_discover
-    #
-    #  run verify tavern test
+    
+    # Run test setup tavern script
+    echo "Running test setup ${setup_test}"
+    run_tavern_test "scenarios/${setup_test}"
+
+    # Run hms_discovery
+    run_discovery
+
+    # Run validation tavern script
+    validate_test=${setup_test//setup/validate}
+    echo "Running test validation ${validate_test}"
+    run_tavern_test "scenarios/${validate_test}"
 done
+
+echo "Integration tests passed"
+exit 0
