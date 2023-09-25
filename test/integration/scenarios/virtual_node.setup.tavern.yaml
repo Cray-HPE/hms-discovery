@@ -33,7 +33,7 @@ stages:
       - 201
 
 ---
-test_name: Populate SLS with management virtual nodes
+test_name: Populate SLS with non-management virtual nodes
 
 marks:
   - parametrize:
