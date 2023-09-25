@@ -103,7 +103,7 @@ func doManagementVirtualNodeDiscovery(ctx context.Context) error {
 
 		component := base.Component{
 			ID:      xname,
-			State:   base.StatePopulated.String(),
+			State:   base.StateStandby.String(), // Use StandBy state to allow HBTD to transistion component states correctly. If using populate HBTD would not be able to tranistion the state, as a force is needed to transition to a different state.
 			Role:    slsExtraProperties.Role,
 			SubRole: slsExtraProperties.SubRole,
 			NID:     json.Number(fmt.Sprintf("%d", slsExtraProperties.NID)),

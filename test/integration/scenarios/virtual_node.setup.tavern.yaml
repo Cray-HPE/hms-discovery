@@ -1,0 +1,65 @@
+---
+test_name: Populate SLS with management virtual nodes
+
+marks:
+  - parametrize:
+      key: 
+      - xname
+      - role
+      - subRole
+      - alias
+      - nid
+      vals:
+        - [x3000c0s1b0n0v0, Management, Worker, ncn-w001, 1000000]
+        - [x3000c0s2b0n0v0, Management, Master, ncn-m001, 1000001]
+
+stages:
+  - name: Populate SLS
+    request:
+      url: "{sls_base_url}/v1/hardware/{xname}"
+      method: PUT
+      json:
+        xname: "{xname}"
+        class: River
+        ExtraProperties:
+          Role: "{role}"
+          SubRole: "{subRole}"
+          NID: !int "{nid}"
+          Aliases:
+          - "{alias}"
+    response:
+      status_code:
+      - 200
+      - 201
+
+---
+test_name: Populate SLS with management virtual nodes
+
+marks:
+  - parametrize:
+      key: 
+      - xname
+      - role
+      - alias
+      - nid
+      vals:
+        - [x3000c0s3b0n0v0, Application, uan-01,     1000002]
+        - [x3000c0s4b0n0v0, Compute,     nid1000003, 1000003]
+
+stages:
+  - name: Populate SLS
+    request:
+      url: "{sls_base_url}/v1/hardware/{xname}"
+      method: PUT
+      json:
+        xname: "{xname}"
+        class: River
+        ExtraProperties:
+          Role: "{role}"
+          NID: !int "{nid}"
+          Aliases:
+          - "{alias}"
+    response:
+      status_code:
+      - 200
+      - 201

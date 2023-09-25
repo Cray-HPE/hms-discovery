@@ -1,0 +1,57 @@
+---
+test_name: Verify management virtual nodes are present in HSM
+
+marks:
+- parametrize:
+    key: 
+    - xname
+    - role
+    - subRole
+    - nid
+    vals:
+    - [x3000c0s1b0n0v0, Management, Worker, 1000000]
+    - [x3000c0s2b0n0v0, Management, Master, 1000001]
+
+stages:
+  - name: Retrieve State Component from HSM
+    request:
+      url: "{hsm_base_url}/hsm/v2/State/Components/{xname}"
+      method: GET
+    response:
+      status_code:
+      - 200
+      json:
+        ID: "{xname}"
+        Type: VirtualNode
+        State: Standby
+        Enabled: true
+        Flag: "OK"
+        Role: "{role}"
+        SubRole: "{subRole}"
+        NID: !int "{nid}"
+        NetType: "Sling"
+        Arch: "X86"
+        Class: "River"
+
+---
+test_name: Verify non-management virtual nodes are not present in HSM
+
+marks:
+- parametrize:
+    key: 
+    - xname
+    - role
+    - subRole
+    - nid
+    vals:
+    - [x3000c0s3b0n0v0, Application, uan-01,     1000002]
+    - [x3000c0s4b0n0v0, Compute,     nid1000003, 1000003]
+
+stages:
+  - name: Retrieve State Component from HSM
+    request:
+      url: "{hsm_base_url}/hsm/v2/State/Components/{xname}"
+      method: GET
+    response:
+      status_code:
+      - 404
