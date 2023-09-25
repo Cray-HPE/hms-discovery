@@ -1,8 +1,8 @@
 kubernetes/.packaged/
 
 # Binaries
-hms_discovery
-vault_loader
+/hms_discovery
+/vault_loader
 
 # Prevent certificates from getting checked in
 *.ca
