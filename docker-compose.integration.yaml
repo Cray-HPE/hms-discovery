@@ -125,46 +125,39 @@ services:
   # RIE
   #
   rfemulator0:
-    hostname: x0c0s1b0
+    hostname: x3210c0s2b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
     environment:
       - MOCKUPFOLDER=DL325
-      - XNAME=x0c0s1b0
+      - XNAME=x3210c0s2b0
       - PORT=443
+      - AUTH_CONFIG=root:password:Administrator
     networks:
       sim:
         aliases:
-          - x0c0s1b0
+          - x3210c0s2b0
   rfemulator1:
-    hostname: x0c0s2b0
+    hostname: x3210c0s3b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
     environment:
       - MOCKUPFOLDER=DL325
-      - XNAME=x0c0s2b0
+      - XNAME=x3210c0s3b0
       - PORT=443
+      - AUTH_CONFIG=root:password:Administrator
     networks:
       sim:
         aliases:
-          - x0c0s2b0
+          - x3210c0s3b0
   rfemulator2:
-    hostname: x0c0s3b0
+    hostname: x3210c0s4b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
     environment:
       - MOCKUPFOLDER=DL325
-      - XNAME=x0c0s3b0
+      - XNAME=x3210c0s4b0
       - PORT=443
+      - AUTH_CONFIG=root:password:Administrator
     networks:
       sim:
         aliases:
-          - x0c0s3b0
-  rfemulator3:
-    hostname: x0c0s4b0
-    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
-    environment:
-      - MOCKUPFOLDER=DL325
-      - XNAME=x0c0s4b0
-      - PORT=443
-    networks:
-      sim:
-        aliases:
-          - x0c0s4b0
+          - x3210c0s4b0
+ 

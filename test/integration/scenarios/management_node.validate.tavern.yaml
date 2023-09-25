@@ -1,0 +1,221 @@
+---
+test_name: Verify Populated HSM Components
+
+marks:
+  - parametrize:
+      key: 
+      - xname
+      - role
+      - subRole
+      - nid
+      vals:
+        - [x3000c0s1b0n0, Management, Master, 1100001]
+
+stages:
+  - name: Retrieve State Component from HSM
+    request:
+      url: "{hsm_base_url}/hsm/v2/State/Components/{xname}"
+      method: GET
+    response:
+      status_code:
+      - 200
+      json:
+        ID: "{xname}"
+        Type: Node
+        State: Populated
+        Enabled: true
+        Flag: "OK"
+        Role: "{role}"
+        SubRole: "{subRole}"
+        NID: !int "{nid}"
+        NetType: "Sling"
+        Arch: "X86"
+        Class: "River"
+
+
+---
+test_name: Verify HSM Components do not exist
+
+marks:
+  - parametrize:
+      key: xname
+      vals: 
+        # These are normally populated by the HMS discovery process
+        - x3000c0s2b0n0
+        - x3000c0s3b0n0
+
+        - x3000c0s4b0n0
+        - x3000c0s5b0n0
+        - x3000c0s6b0n0
+        - x3000c0s7b0n0
+
+        - x3000c0s8b0n0
+        - x3000c0s9b0n0
+        - x3000c0s10b0n0
+
+stages:
+  - name: Retrieve State Component from HSM
+    request:
+      url: "{hsm_base_url}/hsm/v2/State/Components/{xname}"
+      method: GET
+    response:
+      status_code:
+      - 404
+
+---
+test_name: Verify HSM Redfish Endpoints exist
+
+marks:
+  - parametrize:
+      key: xname
+      vals:
+        - x3000c0s1b0
+        - x3000c0s2b0
+        - x3000c0s3b0
+
+        - x3000c0s4b0
+        - x3000c0s5b0
+        - x3000c0s6b0
+        - x3000c0s7b0
+
+        - x3000c0s8b0
+        - x3000c0s9b0
+        - x3000c0s10b0
+
+stages:
+  - name: Retrieve RedfishEndpoint from HSM
+    request:
+      url: "{hsm_base_url}/hsm/v2/Inventory/RedfishEndpoints/{xname}"
+      method: GET
+    response:
+      status_code:
+      - 200
+      verify_response_with:
+        function: tavern.testutils.helpers:validate_pykwalify
+        extra_kwargs:
+          schema:
+            type: map
+            required: True
+            mapping:
+              ID:
+                type: str
+                enum:
+                - "{xname}"
+              Type:
+                type: str
+                enum:
+                - "NodeBMC"
+              Hostname:
+                type: str
+                enum:
+                - "{xname}"
+              Domain:
+                type: str
+                enum:
+                - ""
+              FQDN:
+                type: str
+                enum:
+                - "{xname}"
+              Enabled:
+                type: bool
+                enum:
+                - true
+              User:
+                type: str
+                enum:
+                - "" # It will be the empty string until HSM inventories the BMC, the creds are in Vault which is verified below.
+              Password:
+                type: str
+                enum:
+                - ""
+              RediscoverOnUpdate:
+                type: bool
+                enum:
+                - true
+              DiscoveryInfo:
+                type: map
+                mapping:
+                  LastDiscoveryAttempt:
+                    type: str
+                  LastDiscoveryStatus:
+                    type: str
+---
+test_name: Verify Credentials exist in Vault
+
+marks:
+  - parametrize:
+      key: xname
+      vals:
+        - x3000c0s1b0
+        - x3000c0s2b0
+        - x3000c0s3b0
+
+        - x3000c0s4b0
+        - x3000c0s5b0
+        - x3000c0s6b0
+        - x3000c0s7b0
+
+        - x3000c0s8b0
+        - x3000c0s9b0
+        - x3000c0s10b0
+
+stages:
+  - name: Validate per switch credential under secret/hms-creds
+    request:
+      url: "{vault_base_url}/v1/secret/hms-creds/{xname}"
+      method: GET
+      verify: false
+      headers:
+        X-Vault-Request: "true"
+        X-Vault-Token: hms
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tavern.testutils.helpers:validate_pykwalify
+        extra_kwargs:
+          schema:
+            type: map
+            required: True
+            mapping:
+              request_id:
+                type: str
+              lease_id:
+                type: str
+              renewable:
+                type: bool
+              lease_duration:
+                type: int
+              wrap_info:
+                type: none
+              warnings:
+                type: none
+              auth:
+                type: none
+              data:
+                type: map
+                mapping:
+                  Password:
+                    type: str
+                    enum:
+                    - "password"
+                  SNMPAuthPass:
+                    type: str
+                    enum:
+                    - ""
+                  SNMPPrivPass:
+                    type: str
+                    enum:
+                    - ""
+                  URL:
+                    type: str
+                    enum:
+                    - ""
+                  Username:
+                    type: str
+                    enum:
+                    - "root"
+                  Xname:
+                    type: str
+                    enum:
+                    - "{xname}"

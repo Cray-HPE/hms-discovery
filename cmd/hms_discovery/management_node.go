@@ -79,6 +79,13 @@ func doManagementNodeDiscovery(ctx context.Context) error {
 		bmcXname := xnametypes.GetHMSCompParent(nodeXname)
 		subLogger := logger.With(zap.String("nodeXname", nodeXname), zap.String("bmcXname", bmcXname))
 
+		slsNode := slsNodes[nodeXname]
+		var slsExtraProperties sls_common.ComptypeNode
+		if err := mapstructure.Decode(slsNode.ExtraPropertiesRaw, &slsExtraProperties); err != nil {
+			subLogger.With(zap.Any("slsNode", slsNode), zap.Error(err)).Error("Failed to decode node extra properties")
+			continue
+		}
+
 		// Check to see if redfish endpoint exists
 		if _, err := getHSMInventoryRedfishEndpoint(ctx, bmcXname); err == nil {
 			// Redfish endpoint exists in HSM skip it, no work to do.
@@ -103,50 +110,42 @@ func doManagementNodeDiscovery(ctx context.Context) error {
 			zap.Strings("mgmtSwitchConnectors", xnameMapToSlice(mgmtSwitchConnectors)),
 		).Debug("Found Management Switch Connections")
 
-		if len(mgmtSwitchConnectors) > 0 {
-			subLogger.Debug("Management Node BMC has connection to HMN, creating redfish endpoint")
-			// First check to see if there are credentials in Vault for this xname. If there are we won't
-			// re-set them in case they've been changed from the defaults.
-			credentials, err := hsmCredentialStore.GetCompCred(bmcXname)
+		subLogger.Debug("Creating redfish endpoint for Management Node BMC")
+		// First check to see if there are credentials in Vault for this xname. If there are we won't
+		// re-set them in case they've been changed from the defaults.
+		credentials, err := hsmCredentialStore.GetCompCred(bmcXname)
+		if err != nil {
+			subLogger.With(zap.Error(err)).
+				Error("Unable to check Vault for BMC credentials, not creating RedfishEndpoint in HSM")
+			continue
+		}
+
+		if credentials.Username == "" || credentials.Password == "" {
+			credentials := compcredentials.CompCredentials{
+				Xname:    bmcXname,
+				Username: defaultCreds["Cray"].Username,
+				Password: defaultCreds["Cray"].Password,
+			}
+
+			err = hsmCredentialStore.StoreCompCred(credentials)
 			if err != nil {
 				subLogger.With(zap.Error(err)).
-					Error("Unable to check Vault for BMC credentials, not creating RedfishEndpoint in HSM")
+					Error("Unable to set credentials, not creating RedfishEndpoint in HSM")
 				continue
 			}
-
-			if credentials.Username == "" || credentials.Password == "" {
-				credentials := compcredentials.CompCredentials{
-					Xname:    bmcXname,
-					Username: defaultCreds["Cray"].Username,
-					Password: defaultCreds["Cray"].Password,
-				}
-
-				err = hsmCredentialStore.StoreCompCred(credentials)
-				if err != nil {
-					subLogger.With(zap.Error(err)).
-						Error("Unable to set credentials, not creating RedfishEndpoint in HSM")
-					continue
-				}
-				subLogger.Debug("Set BMC credentials in Vault")
-			} else {
-				subLogger.Debug("BMC credentials already exist in Vault")
-			}
-
-			if err := informHSM(bmcXname, bmcXname, ""); err != nil {
-				subLogger.With(zap.Error(err)).Error("Failed to inform HSM about Management Node BMC")
-			}
-
-			subLogger.Info("Created RedfishEndpoint in HSM for Management Node BMC")
-
+			subLogger.Debug("Set BMC credentials in Vault")
 		} else {
-			subLogger.Debug("Management Node BMC has no connection to HMN, creating component in HSM")
+			subLogger.Debug("BMC credentials already exist in Vault")
+		}
 
-			slsNode := slsNodes[nodeXname]
-			var slsExtraProperties sls_common.ComptypeNode
-			if err := mapstructure.Decode(slsNode.ExtraPropertiesRaw, &slsExtraProperties); err != nil {
-				subLogger.With(zap.Any("slsNode", slsNode), zap.Error(err)).Error("Failed to decode node extra properties")
-				continue
-			}
+		if err := informHSM(bmcXname, bmcXname, ""); err != nil {
+			subLogger.With(zap.Error(err)).Error("Failed to inform HSM about Management Node BMC")
+		}
+
+		subLogger.Info("Created RedfishEndpoint in HSM for Management Node BMC")
+
+		if len(mgmtSwitchConnectors) == 0 && slsExtraProperties.SubRole == "Master" {
+			subLogger.Debug("Management Node BMC has no connection to HMN, creating component in HSM")
 
 			component := base.Component{
 				ID:      nodeXname,
