@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.0] - 2023-09-25
+
+### Added
+- Added Vault loader (copied over from REDS) to populate default River Redfish and SNMP credentials into vault.
+- Discover Management Nodes just like REDS
+- Discover Management Virtual Nodes
+- Populate per-switch credentials in Vault like REDS.
+
+### Changed
+- Updated hms-sls to v2 Go module.
+- Migrated to hms-xname and hms-base/v2
+
 ## [1.14.0] - 2022-08-01
 
 ### Changed
