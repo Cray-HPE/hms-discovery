@@ -272,7 +272,7 @@ func main() {
 
 	if *managementSwitchCredentials {
 		if err := doManagementSwitchCredentials(context.Background()); err != nil {
-			logger.With(zap.Error(err)).Error("Failed to handle Management Switch credentials") // TODO handle wording
+			logger.With(zap.Error(err)).Error("Failed to populate Management Switch credentials")
 		}
 	}
 

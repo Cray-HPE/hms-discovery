@@ -88,14 +88,14 @@ func doManagementNodeDiscovery(ctx context.Context) error {
 	logger.With(zap.Strings("xnames", xnameSetToSlice(missingFromHSM))).Info("Management Nodes present in SLS, missing from HSM")
 	logger.With(zap.Strings("xnames", xnameSetToSlice(missingFromSLS))).Info("Management Nodes present in HSM, missing from SLS")
 
-	//
-	// Determine which TODO
-	//
 	defaultCreds, err := redsCredentialStore.GetDefaultCredentials()
 	if err != nil {
 		return errors.Join(fmt.Errorf("unable to get default credentials"), err)
 	}
 
+	//
+	// Populate HSM with missing managment nodes
+	//
 	for nodeXname := range missingFromHSM {
 		bmcXname := xnametypes.GetHMSCompParent(nodeXname)
 		subLogger := logger.With(zap.String("nodeXname", nodeXname), zap.String("bmcXname", bmcXname))
