@@ -61,7 +61,7 @@ func doManagementNodeDiscovery(ctx context.Context) error {
 	}
 
 	//
-	// Determine differences between SLS and HSM
+	// Determine differences between SLS and HSM Components
 	//
 	missingFromHSM := map[string]bool{}
 	missingFromSLS := map[string]bool{}
@@ -84,9 +84,9 @@ func doManagementNodeDiscovery(ctx context.Context) error {
 		}
 	}
 
-	logger.With(zap.Strings("xnames", xnameSetToSlice(presentInBoth))).Info("Management Nodes present in both SLS and HSM")
-	logger.With(zap.Strings("xnames", xnameSetToSlice(missingFromHSM))).Info("Management Nodes present in SLS, missing from HSM")
-	logger.With(zap.Strings("xnames", xnameSetToSlice(missingFromSLS))).Info("Management Nodes present in HSM, missing from SLS")
+	logger.With(zap.Strings("xnames", xnameSetToSlice(presentInBoth))).Info("Management Nodes present in both SLS and HSM State Components")
+	logger.With(zap.Strings("xnames", xnameSetToSlice(missingFromHSM))).Info("Management Nodes present in SLS, missing from HSM State Components")
+	logger.With(zap.Strings("xnames", xnameSetToSlice(missingFromSLS))).Info("Management Nodes present in HSM State Components, missing from SLS")
 
 	defaultCreds, err := redsCredentialStore.GetDefaultCredentials()
 	if err != nil {

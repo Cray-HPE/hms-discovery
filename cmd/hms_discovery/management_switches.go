@@ -33,7 +33,7 @@ import (
 )
 
 func doManagementSwitchCredentials(ctx context.Context) error {
-	logger.Info("Populating Management Switch credentials in vault")
+	logger.Info("Starting Management Switch credential population in vault")
 
 	//
 	// Find management switches in SLS
@@ -65,6 +65,9 @@ func doManagementSwitchCredentials(ctx context.Context) error {
 		return errors.Join(fmt.Errorf("failed to retrieve default switch SNMP credentials from vault"), err)
 	}
 
+	populatedCredentails := []string{}
+	alreadyPopulated := []string{}
+
 	for xname, slsSwitch := range allManagementSwitches {
 		subLogger := logger.With(zap.String("xname", xname))
 
@@ -90,7 +93,9 @@ func doManagementSwitchCredentials(ctx context.Context) error {
 		}
 
 		if switchCred.SNMPAuthPass != "" && switchCred.SNMPPrivPass != "" && switchCred.Username != "" {
-			subLogger.Debug("Found switch creds in vault")
+			subLogger.Debug("Found populated switch creds in vault")
+			alreadyPopulated = append(alreadyPopulated, xname)
+
 			continue
 		}
 
@@ -123,7 +128,11 @@ func doManagementSwitchCredentials(ctx context.Context) error {
 		}
 
 		subLogger.Info("Stored credential for switch")
+		populatedCredentails = append(populatedCredentails, xname)
 	}
+
+	logger.With(zap.Strings("populatedCredentails", populatedCredentails)).Info("Switches with new credentials pushed into Vault")
+	logger.With(zap.Strings("alreadyPopulated", alreadyPopulated)).Info("Switches with existing credentials in Vault")
 
 	return nil
 }

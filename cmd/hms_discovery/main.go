@@ -63,10 +63,10 @@ var (
 	mountainDiscoveryScript = flag.String("mountain_discovery_script", "mountain_discovery.py",
 		"Location of the script to give Python to run for Mountain discovery.")
 
-	discoverManagementVirtualNodes   = flag.Bool("discover_management_virtual_nodes", true, "Discover Management Virtual nodes")
-	discoverManagementNodes          = flag.Bool("discover_management_nodes", true, "Discover Management Nodes")
-	rediscoverFailedRedfishEndpoints = flag.Bool("rediscover_failed_redfish_endpoints", true, "Rediscover Failed Redfish Endpoints")
-	managementSwitchCredentials      = flag.Bool("management_switch_credentials", true, "Handle management switch credentials")
+	discoverManagementVirtualNodes      = flag.Bool("discover_management_virtual_nodes", true, "Discover Management Virtual nodes")
+	discoverManagementNodes             = flag.Bool("discover_management_nodes", true, "Discover Management Nodes")
+	rediscoverFailedRedfishEndpoints    = flag.Bool("rediscover_failed_redfish_endpoints", true, "Rediscover Failed Redfish Endpoints")
+	populateManagementSwitchCredentials = flag.Bool("populate_management_switch_credentials", true, "Populate management switch credentials")
 
 	httpClient *retryablehttp.Client
 
@@ -242,7 +242,8 @@ func main() {
 		zap.Bool("discoverMountain", *discoverMountain),
 		zap.Bool("discoverManagementVirtualNodes", *discoverManagementVirtualNodes),
 		zap.Bool("discoverManagementNodes", *discoverManagementNodes),
-		zap.Bool("managementSwitchCredentials", *managementSwitchCredentials),
+		zap.Bool("managementSwitchCredentials", *populateManagementSwitchCredentials),
+		zap.Bool("rediscoverFailedRedfishEndpoints", *rediscoverFailedRedfishEndpoints),
 		zap.String("atomicLevel", atomicLevel.String()),
 	)
 
@@ -270,7 +271,7 @@ func main() {
 		}
 	}
 
-	if *managementSwitchCredentials {
+	if *populateManagementSwitchCredentials {
 		if err := doManagementSwitchCredentials(context.Background()); err != nil {
 			logger.With(zap.Error(err)).Error("Failed to populate Management Switch credentials")
 		}
