@@ -1,0 +1,104 @@
+#
+# MIT License
+#
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+---
+test_name: Verify Credentials management switch credentials in Vault
+
+marks:
+- parametrize:
+    key:
+    - xname
+    - snmp_username
+    - snmn_auth_password
+    - smnp_priv_password
+    vals:
+    # Switches new
+    - [x3000c0w10,   user-x3000c0w10, password_auth, password_priv] # username defined in SLS
+    - [x3000c0h33s1, user_snmp,       password_auth, password_priv] # Default username
+    - [d0w1,         user_snmp,       password_auth, password_priv] # Default username
+
+    # Switches existing
+    - [x3000c0w11,   user-x3000c0w11,   auth-x3000c0w11,   priv-x3000c0w11]
+    - [x3000c0h33s2, user-x3000c0h33s2, auth-x3000c0h33s2, priv-x3000c0h33s2]
+    - [d0w2,         user-d0w2,         auth-d0w2,         priv-d0w2]
+
+stages:
+  - name: Validate per switch credential under secret/hms-creds
+    request:
+      url: "{vault_base_url}/v1/secret/hms-creds/{xname}"
+      method: GET
+      verify: false
+      headers:
+        X-Vault-Request: "true"
+        X-Vault-Token: hms
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tavern.testutils.helpers:validate_pykwalify
+        extra_kwargs:
+          schema:
+            type: map
+            required: True
+            mapping:
+              request_id:
+                type: str
+              lease_id:
+                type: str
+              renewable:
+                type: bool
+              lease_duration:
+                type: int
+              wrap_info:
+                type: none
+              warnings:
+                type: none
+              auth:
+                type: none
+              data:
+                type: map
+                mapping:
+                  Password:
+                    type: str
+                    enum:
+                    - ""
+                  SNMPAuthPass:
+                    type: str
+                    enum:
+                    - "{snmn_auth_password}"
+                  SNMPPrivPass:
+                    type: str
+                    enum:
+                    - "{smnp_priv_password}"
+                  URL:
+                    type: str
+                    enum:
+                    - ""
+                  Username:
+                    type: str
+                    enum:
+                    - "{snmp_username}"
+                  Xname:
+                    type: str
+                    enum:
+                    - "{xname}"
+              

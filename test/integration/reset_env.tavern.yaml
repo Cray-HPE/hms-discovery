@@ -1,0 +1,91 @@
+#
+# MIT License
+#
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+---
+test_name: Populate default credentials into Vault 
+stages:
+  - name: Push in global default redfish credentials
+    request:
+      url: "{vault_base_url}/v1/secret/reds-creds/defaults"
+      method: POST
+      verify: false
+      headers:
+        X-Vault-Request: "true"
+        X-Vault-Token: hms
+      json:
+        Cray:
+          username: "root"
+          password: "password"
+    response:
+      status_code: 204
+
+  - name: Push in global default switch credentials
+    request:
+      url: "{vault_base_url}/v1/secret/reds-creds/switch_defaults"
+      method: POST
+      verify: false
+      headers:
+        X-Vault-Request: "true"
+        X-Vault-Token: hms
+      json:
+        SNMPAuthPassword: "password_auth"
+        SNMPPrivPassword: "password_priv"
+        SNMPUsername: "user_snmp"
+    response:
+      status_code: 204
+
+---
+test_name: Reset Hardware State Manager 
+stages:
+  - name: Clear HSM State Components
+    request:
+      url: "{hsm_base_url}/hsm/v2/State/Components"
+      method: DELETE
+      verify: false
+    response:
+      status_code:
+      - 200
+      - 404
+  - name: Clear HSM Redfish Endpoints
+    request:
+      url: "{hsm_base_url}/hsm/v2/Inventory/RedfishEndpoints"
+      method: DELETE
+      verify: false
+    response:
+      status_code:
+      - 200
+      - 404
+
+---
+test_name: Reset System Layout Service
+stages:
+  - name: Clear SLS
+    request:
+      url: "{sls_base_url}/v1/loadstate"
+      method: POST
+      files:
+        sls_dump: "{empty_sls_state_file}"
+      verify: false
+    response:
+      status_code:
+      - 204

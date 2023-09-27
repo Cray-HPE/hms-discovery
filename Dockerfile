@@ -21,7 +21,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 # Build base just has the packages installed we need.
-FROM artifactory.algol60.net/docker.io/library/golang:1.16-alpine AS build-base
+FROM artifactory.algol60.net/docker.io/library/golang:1.21-alpine AS build-base
 
 RUN set -ex \
     && apk -U upgrade \
@@ -42,7 +42,8 @@ COPY vendor     $GOPATH/src/github.com/Cray-HPE/hms-discovery/vendor
 FROM base AS builder
 
 RUN set -ex \
-    && go build -v -o /usr/local/bin/discovery github.com/Cray-HPE/hms-discovery/cmd/hms_discovery
+    && go build -v -o /usr/local/bin/discovery github.com/Cray-HPE/hms-discovery/cmd/hms_discovery \
+    && go build -v -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-discovery/cmd/vault_loader
 
 
 # Stage all of the Mountain discovery stuff in advance.
@@ -67,6 +68,7 @@ FROM mountain-base
 LABEL maintainer="Hewlett Packard Enterprise"
 
 COPY --from=builder /usr/local/bin/discovery /usr/local/bin
+COPY --from=builder /usr/local/bin/vault_loader /usr/local/bin
 ENV HSM_BASE_PATH="/hsm/v2"
 ENV MOUNTAIN_DISCOVERY_SCRIPT="/mountain-discovery/mountain_discovery.py"
 

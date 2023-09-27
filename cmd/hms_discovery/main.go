@@ -24,6 +24,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -62,8 +63,10 @@ var (
 	mountainDiscoveryScript = flag.String("mountain_discovery_script", "mountain_discovery.py",
 		"Location of the script to give Python to run for Mountain discovery.")
 
-	bootNewRiverNodes = flag.Bool("boot_new_river_nodes", false,
-		"When we discover a new node, should we power it on (to make it run REDS)?")
+	discoverManagementVirtualNodes      = flag.Bool("discover_management_virtual_nodes", true, "Discover Management Virtual nodes")
+	discoverManagementNodes             = flag.Bool("discover_management_nodes", true, "Discover Management Nodes")
+	rediscoverFailedRedfishEndpoints    = flag.Bool("rediscover_failed_redfish_endpoints", true, "Rediscover Failed Redfish Endpoints")
+	populateManagementSwitchCredentials = flag.Bool("populate_management_switch_credentials", true, "Populate management switch credentials")
 
 	httpClient *retryablehttp.Client
 
@@ -237,19 +240,40 @@ func main() {
 		zap.String("hsmURL", *hsmURL),
 		zap.Bool("discoverRiver", *discoverRiver),
 		zap.Bool("discoverMountain", *discoverMountain),
-		zap.Bool("bootNewRiverNodes", *bootNewRiverNodes),
+		zap.Bool("discoverManagementVirtualNodes", *discoverManagementVirtualNodes),
+		zap.Bool("discoverManagementNodes", *discoverManagementNodes),
+		zap.Bool("managementSwitchCredentials", *populateManagementSwitchCredentials),
+		zap.Bool("rediscoverFailedRedfishEndpoints", *rediscoverFailedRedfishEndpoints),
 		zap.String("atomicLevel", atomicLevel.String()),
 	)
 
 	// Loop waiting for the connection to Vault to work.
 	var err error
-	for true {
+	for {
 		err = setupVault()
 		if err != nil {
 			logger.Error("Unable to setup Vault!", zap.Error(err))
 			time.Sleep(time.Second * 1)
 		} else {
 			break
+		}
+	}
+
+	if *discoverManagementVirtualNodes {
+		if err := doManagementVirtualNodeDiscovery(context.Background()); err != nil {
+			logger.With(zap.Error(err)).Error("Failed to discover Management VirtualNodes")
+		}
+	}
+
+	if *discoverManagementNodes {
+		if err := doManagementNodeDiscovery(context.Background()); err != nil {
+			logger.With(zap.Error(err)).Error("Failed to discover Management Nodes")
+		}
+	}
+
+	if *populateManagementSwitchCredentials {
+		if err := doManagementSwitchCredentials(context.Background()); err != nil {
+			logger.With(zap.Error(err)).Error("Failed to populate Management Switch credentials")
 		}
 	}
 
@@ -261,54 +285,57 @@ func main() {
 		doMountainDiscovery()
 	}
 
-	// At this point we should take advantage of the fact that we know all this information about the system and try
-	// to fix any discovery attempts that have gone poorly.
-	var potentiallyDiscoverableEndpoints []string
+	if *rediscoverFailedRedfishEndpoints {
 
-	notDiscoveredOKEndpoints := getNotDiscoveredOKEndpointFromHSM()
-	logger.Debug("Endpoints with last discovery status not equal to DiscoverOK.",
-		zap.Any("notDiscoveredOKEndpoints", notDiscoveredOKEndpoints))
+		// At this point we should take advantage of the fact that we know all this information about the system and try
+		// to fix any discovery attempts that have gone poorly.
+		var potentiallyDiscoverableEndpoints []string
 
-	var notDiscoveredXnames []string
-	var endpointWaitGroup sync.WaitGroup
+		notDiscoveredOKEndpoints := getNotDiscoveredOKEndpointFromHSM()
+		logger.Debug("Endpoints with last discovery status not equal to DiscoverOK.",
+			zap.Any("notDiscoveredOKEndpoints", notDiscoveredOKEndpoints))
 
-	for _, endpoint := range notDiscoveredOKEndpoints {
-		notDiscoveredXnames = append(notDiscoveredXnames, endpoint.ID)
+		var notDiscoveredXnames []string
+		var endpointWaitGroup sync.WaitGroup
 
-		endpointWaitGroup.Add(1)
+		for _, endpoint := range notDiscoveredOKEndpoints {
+			notDiscoveredXnames = append(notDiscoveredXnames, endpoint.ID)
 
-		go func(endpoint rf.RedfishEPDescription) {
-			defer endpointWaitGroup.Done()
+			endpointWaitGroup.Add(1)
 
-			// Check to see if it's Redfish is endpoint is reachable.
-			reachableErr := checkBMCRedfish(endpoint.ID, endpoint.FQDN)
-			if reachableErr != nil {
-				logger.Warn("BMC is not reachable, ignoring for now.",
-					zap.Error(reachableErr),
-					zap.String("xname", endpoint.ID),
-					zap.String("fqdn", endpoint.FQDN))
-			} else {
-				logger.Info("BMC is reachable and Redfish is responsive.",
-					zap.String("xname", endpoint.ID),
-					zap.String("fqdn", endpoint.FQDN))
+			go func(endpoint rf.RedfishEPDescription) {
+				defer endpointWaitGroup.Done()
 
-				potentiallyDiscoverableEndpoints = append(potentiallyDiscoverableEndpoints, endpoint.ID)
-			}
-		}(endpoint)
-	}
+				// Check to see if it's Redfish is endpoint is reachable.
+				reachableErr := checkBMCRedfish(endpoint.ID, endpoint.FQDN)
+				if reachableErr != nil {
+					logger.Warn("BMC is not reachable, ignoring for now.",
+						zap.Error(reachableErr),
+						zap.String("xname", endpoint.ID),
+						zap.String("fqdn", endpoint.FQDN))
+				} else {
+					logger.Info("BMC is reachable and Redfish is responsive.",
+						zap.String("xname", endpoint.ID),
+						zap.String("fqdn", endpoint.FQDN))
 
-	endpointWaitGroup.Wait()
-
-	if len(potentiallyDiscoverableEndpoints) > 0 {
-		reDiscoverEndpoints(potentiallyDiscoverableEndpoints)
-	} else {
-		if len(notDiscoveredOKEndpoints) > 0 {
-			logger.Info("HSM contains undiscovered Redfish endpoints, however none are reachable.",
-				zap.Strings("notDiscoveredOKEndpoints", notDiscoveredXnames))
-		} else {
-			logger.Info("All Redfish endpoints in HSM are already discovered.")
+					potentiallyDiscoverableEndpoints = append(potentiallyDiscoverableEndpoints, endpoint.ID)
+				}
+			}(endpoint)
 		}
-	}
 
+		endpointWaitGroup.Wait()
+
+		if len(potentiallyDiscoverableEndpoints) > 0 {
+			reDiscoverEndpoints(potentiallyDiscoverableEndpoints)
+		} else {
+			if len(notDiscoveredOKEndpoints) > 0 {
+				logger.Info("HSM contains undiscovered Redfish endpoints, however none are reachable.",
+					zap.Strings("notDiscoveredOKEndpoints", notDiscoveredXnames))
+			} else {
+				logger.Info("All Redfish endpoints in HSM are already discovered.")
+			}
+		}
+
+	}
 	logger.Info("HMS Discovery process complete.")
 }

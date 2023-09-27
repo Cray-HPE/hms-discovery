@@ -28,5 +28,8 @@ all: image snyk
 image:
 	docker build ${NO_CACHE} --pull ${DOCKER_ARGS} --tag '${NAME}:${VERSION}' .
 
+integration:
+	./runIntegration.sh
+
 snyk:
 	./runSnyk.sh
