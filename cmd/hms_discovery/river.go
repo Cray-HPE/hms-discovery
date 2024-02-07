@@ -1,6 +1,6 @@
 // MIT License
 //
-// (C) Copyright [2020-2022] Hewlett Packard Enterprise Development LP
+// (C) Copyright [2020-2022,2024] Hewlett Packard Enterprise Development LP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -242,22 +242,35 @@ func doRiverDiscovery() {
 				}
 			}
 
-			// Put the creds in Vault.
-			compCred := compcredentials.CompCredentials{
-				Xname:    xname,
-				Username: defaultCredentials["Cray"].Username,
-				Password: defaultCredentials["Cray"].Password,
-			}
-			compCredErr := hsmCredentialStore.StoreCompCred(compCred)
-			if compCredErr != nil {
-				logger.Fatal("Failed to store BMC credentials!",
-					zap.Error(compCredErr),
+			creds, credsErr := hsmCredentialStore.GetCompCred(xname)
+			if credsErr != nil {
+				logger.Info("Using the default creds, because there was a failure reading the creds from vault",
 					zap.String("xname", xname),
-				)
+					zap.Error(credsErr))
+			}
 
-				failedXnames = append(failedXnames, xname)
+			if (creds.Xname == "" && creds.Username == "") || credsErr != nil {
+				// Put the creds in Vault.
+				compCred := compcredentials.CompCredentials{
+					Xname:    xname,
+					Username: defaultCredentials["Cray"].Username,
+					Password: defaultCredentials["Cray"].Password,
+				}
+				compCredErr := hsmCredentialStore.StoreCompCred(compCred)
+				if compCredErr != nil {
+					logger.Fatal("Failed to store BMC credentials!",
+						zap.Error(compCredErr),
+						zap.String("xname", xname),
+					)
 
-				break
+					failedXnames = append(failedXnames, xname)
+
+					break
+				}
+			} else {
+				logger.Info("Not writing default creds, because existing creds were found in vault.",
+					zap.String("xname", xname),
+					zap.String("username", creds.Username))
 			}
 
 			// From here on we know the xname is reachable and Redfish is responsive.
