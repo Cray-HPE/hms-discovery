@@ -214,6 +214,8 @@ func main() {
 	// Parse the arguments.
 	flag.Parse()
 
+        fmt.Printf("Hello world!\n")
+
 	*hsmURL = *hsmURL + "/hsm/v2"
 
 	setupLogging()
