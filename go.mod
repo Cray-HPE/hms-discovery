@@ -11,7 +11,7 @@ require (
 	github.com/Cray-HPE/hms-smd v1.30.9
 	github.com/Cray-HPE/hms-xname v1.3.0
 	github.com/geoffgarside/ber v0.0.0-20181018193237-27a1aff36ce6 // indirect
-	github.com/hashicorp/go-retryablehttp v0.7.1
+	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/k-sone/snmpgo v3.2.0+incompatible
 	github.com/mitchellh/mapstructure v1.3.0
 	github.com/namsral/flag v1.7.4-pre
