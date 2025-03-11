@@ -1,6 +1,6 @@
 # MIT License
 #
-# (C) Copyright [2020-2022,2024] Hewlett Packard Enterprise Development LP
+# (C) Copyright [2020-2022,2024-2025] Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -47,21 +47,25 @@ RUN set -ex \
 
 
 # Stage all of the Mountain discovery stuff in advance.
-FROM artifactory.algol60.net/docker.io/alpine:3.15 AS mountain-base
+FROM artifactory.algol60.net/docker.io/alpine:3.21 AS mountain-base
 
 # Pull in the Mountain discovery bits directly from that image.
 # TODO: Update this with 'latest' tag when available in algol60
-COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.7.0 /requirements.txt /mountain-discovery/
-COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.7.0 /app /mountain-discovery
+COPY --from=artifactory.algol60.net/csm-docker/unstable/hms-mountain-discovery:0.8.0-20250311142556.713ff66 /requirements.txt /mountain-discovery/
+COPY --from=artifactory.algol60.net/csm-docker/unstable/hms-mountain-discovery:0.8.0-20250311142556.713ff66 /app /mountain-discovery
 
 RUN set -ex \
     && apk -U upgrade \
     && apk add \
         python3 \
         py3-pip \
+    && python3 -m venv /opt/venv \
+    && . /opt/venv/bin/activate \
     && pip3 install --upgrade pip setuptools \
     && pip3 install -r /mountain-discovery/requirements.txt
 
+# Set the PATH to include the virtual environment
+ENV PATH="/opt/venv/bin:$PATH"
 
 ## Final Stage ###
 FROM mountain-base

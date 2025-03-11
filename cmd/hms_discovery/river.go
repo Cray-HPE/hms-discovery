@@ -1,6 +1,6 @@
 // MIT License
 //
-// (C) Copyright [2020-2022,2024] Hewlett Packard Enterprise Development LP
+// (C) Copyright [2020-2022,2024-2025] Hewlett Packard Enterprise Development LP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -35,8 +35,8 @@ import (
 	"github.com/Cray-HPE/hms-discovery/pkg/snmp_utilities"
 	"github.com/Cray-HPE/hms-discovery/pkg/switches"
 	sls_common "github.com/Cray-HPE/hms-sls/v2/pkg/sls-common"
-	rf "github.com/Cray-HPE/hms-smd/pkg/redfish"
-	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	rf "github.com/Cray-HPE/hms-smd/v2/pkg/redfish"
+	"github.com/Cray-HPE/hms-smd/v2/pkg/sm"
 	"github.com/Cray-HPE/hms-xname/xnametypes"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/mitchellh/mapstructure"

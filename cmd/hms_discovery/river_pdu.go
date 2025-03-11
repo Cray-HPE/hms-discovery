@@ -1,6 +1,6 @@
 // MIT License
 //
-// (C) Copyright [2020-2022] Hewlett Packard Enterprise Development LP
+// (C) Copyright [2020-2022,2025] Hewlett Packard Enterprise Development LP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -27,7 +27,7 @@ import (
 	"net/http"
 
 	"github.com/Cray-HPE/hms-discovery/pkg/pdu_credential_store"
-	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	"github.com/Cray-HPE/hms-smd/v2/pkg/sm"
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 )

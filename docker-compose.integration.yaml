@@ -1,12 +1,10 @@
-version: '3.7'
-
 networks:
   sim:
 
 services:
   vault:
     hostname: vault
-    image: artifactory.algol60.net/docker.io/library/vault:1.5.5
+    image: artifactory.algol60.net/docker.io/library/vault:1.6.1
     environment:
       - VAULT_DEV_ROOT_TOKEN_ID=hms
       - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
@@ -18,7 +16,7 @@ services:
     networks:
       - sim
   vault-kv-enabler:
-    image: artifactory.algol60.net/csm-docker/stable/vault-kv-enabler:1.18.0
+    image: artifactory.algol60.net/csm-docker/stable/vault-kv-enabler:1.25.0
     environment:
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
@@ -42,7 +40,7 @@ services:
     networks:
       - sim
   cray-sls-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.3.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.8.0
     command: ["sls-init"]
     environment:
       - POSTGRES_HOST=sls-postgres
@@ -53,7 +51,7 @@ services:
     networks:
       - sim
   cray-sls:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.3.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.8.0
     environment:
       - POSTGRES_HOST=cray-sls-postgres
       - DBOPTS=sslmode=disable
@@ -85,7 +83,7 @@ services:
     networks:
       - sim
   cray-smd-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.13.0	
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.35.0	
     command: /entrypoint.sh smd-init
     environment:
       - SMD_DBHOST=hmsds-postgres
@@ -95,7 +93,7 @@ services:
     networks:
       - sim
   cray-smd:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.13.0	
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.35.0	
     environment:
       - POSTGRES_HOST=hmsds-postgres
       - POSTGRES_PORT=5432
@@ -126,7 +124,7 @@ services:
   #
   rfemulator0:
     hostname: x3210c0s2b0
-    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.7.0-20250310190309.6e04b55
     environment:
       - MOCKUPFOLDER=DL325
       - XNAME=x3210c0s2b0
@@ -138,7 +136,7 @@ services:
           - x3210c0s2b0
   rfemulator1:
     hostname: x3210c0s3b0
-    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.7.0-20250310190309.6e04b55
     environment:
       - MOCKUPFOLDER=DL325
       - XNAME=x3210c0s3b0
@@ -150,7 +148,7 @@ services:
           - x3210c0s3b0
   rfemulator2:
     hostname: x3210c0s4b0
-    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.3.0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.7.0-20250310190309.6e04b55
     environment:
       - MOCKUPFOLDER=DL325
       - XNAME=x3210c0s4b0
