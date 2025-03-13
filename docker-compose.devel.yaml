@@ -19,7 +19,7 @@ services:
     environment:
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - KV_STORES=hms-creds,reds-creds,pdu-creds
+      - KV_STORES=secret
     depends_on:
       - vault
 
@@ -72,9 +72,11 @@ services:
       - CRAY_VAULT_JWT_FILE=configs/token
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
+      - VAULT_KEYPATH=secret/hms-creds
       - SMD_WVAULT=true
       - SMD_RVAULT=true
+      - SMD_SLS_HOST=http://cray-sls:8376/v1
+      - SMD_HBTD_HOST=
     hostname: cray-smd
     depends_on:
       - cray-smd-init
@@ -110,7 +112,7 @@ services:
       - CRAY_VAULT_JWT_FILE=configs/token
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
+      - VAULT_KEYPATH=secret/hms-creds
     ports:
       - "8376:8376"
     depends_on:

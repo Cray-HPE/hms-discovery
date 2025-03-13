@@ -9,13 +9,13 @@
 2. Load SLS file into SLS:
     
     ```bash
-    $ curl -X POST -F sls_dump=@configs/slsTestConfig.json http://localhost:8376/v1/loadstate
+    curl -X POST -F sls_dump=@configs/slsTestConfig.json http://localhost:8376/v1/loadstate
     ```
 
 ## Manually Adding in Default Credentials
 Exec into the vault container, and login to vault:
 ```bash
-$ docker exec -it hms-discovery_vault_1 sh
+$ docker exec -it hms-discovery-vault-1 sh
 / # vault login hms
 ```
 ### REDS
@@ -27,14 +27,14 @@ Load in the credentials into `reds-creds`:
         "Password": "cray"
     }
 }' > vaultRedsDefaults.json
-/ # vault kv put reds-creds/defaults @vaultRedsDefaults.json
-/ # vault kv put reds-creds/switch_defaults SNMPUsername=user SNMPAuthPassword=snmpauth SNMPPrivPassword=snmppriv
+/ # vault kv put secret/reds-creds/defaults @vaultRedsDefaults.json
+/ # vault kv put secret/reds-creds/switch_defaults SNMPUsername=user SNMPAuthPassword=snmpauth SNMPPrivPassword=snmppriv
 ```
 ### PDUs
 Load in the default PDU Credentials
 ```bash
-/ # vault kv put pdu-creds/global/rts username=root password=rts
-/ # vault kv put pdu-creds/global/pdu username=root password=pdu
+/ # vault kv put secret/pdu-creds/global/rts username=root password=rts
+/ # vault kv put secret/pdu-creds/global/pdu username=root password=pdu
 ```
 
 ## Manually Populating the Ethernet Interfaces Table with unknown components
@@ -48,7 +48,7 @@ The MAC address for uan01 is `b42e993b7030`. So we need to add a blank ethernet 
 ```
 
 ```bash
-$ curl -i -X POST -H "Content-Type: application/json" \
+curl -i -X POST -H "Content-Type: application/json" \
   -d '{"MACAddress":"b4:2e:99:3b:70:30", "IPAddresses":[{"IPAddress":"10.252.0.34"}], "Description": "UAN - Login" }' \
   http://localhost:27779/hsm/v2/Inventory/EthernetInterfaces
 ```
@@ -69,19 +69,10 @@ curl -i -X POST -H "Content-Type: application/json" \
 ```
 
 ## Running Discovery
-The following environment variables are required to be set for Discovery to run properly:
+The following shell script has the necessary environment variables set up and will launch discovery:
+
 ```bash
-export SLS_URL=http://localhost:8376
-export HSM_URL=http://localhost:27779
-export CRAY_VAULT_AUTH_PATH=auth/token/create
-export CRAY_VAULT_ROLE_FILE=configs/namespace
-export CRAY_VAULT_JWT_FILE=configs/token
-export VAULT_ADDR=http://localhost:8200
-export VAULT_TOKEN=hms
-export SNMP_MODE=MOCK
-export DISCOVER_MOUNTAIN=false
-export DISCOVER_RIVER=true
-export LOG_LEVEL=DEBUG
+./runDiscovery.sh
 ```
 
 ## Resetting Env

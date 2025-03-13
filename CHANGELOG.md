@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated image and module dependencies for security updates
 - Various code changes to accomodate module updates
 - Resolved build warnings in Dockerfiles and docker compose files
+- Fixed docker-compose.devel.yaml file so that local dev testing works again
+- Updated local dev testing readme for accuracy
 
 ## [1.17.0] - 2024-12-03
 
