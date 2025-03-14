@@ -4,7 +4,7 @@
 1. Startup the required Docker containers (do this in the root of this repo):
 
   ```bash
-    $ docker-compose -f docker-compose.devel.yaml up
+    docker-compose -f docker-compose.devel.yaml up
     ```
 2. Load SLS file into SLS:
     
