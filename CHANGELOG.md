@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.0] - 2025-03-14
+
+### Security
+
+- Updated image and module dependencies for security updates
+- Various code changes to accomodate module updates
+- Fixed docker-compose.devel.yaml file so that local dev testing works again
+- Updated local dev testing readme for accuracy
+
 ## [1.17.0] - 2024-12-03
 
 ### Changed

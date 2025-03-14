@@ -1,6 +1,6 @@
 // MIT License
 //
-// (C) Copyright [2023] Hewlett Packard Enterprise Development LP
+// (C) Copyright [2023,2025] Hewlett Packard Enterprise Development LP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -29,9 +29,9 @@ import (
 	"io"
 	"strings"
 
-	base "github.com/Cray-HPE/hms-base"
+	base "github.com/Cray-HPE/hms-base/v2"
 	sls_common "github.com/Cray-HPE/hms-sls/v2/pkg/sls-common"
-	rf "github.com/Cray-HPE/hms-smd/pkg/redfish"
+	rf "github.com/Cray-HPE/hms-smd/v2/pkg/redfish"
 	"github.com/Cray-HPE/hms-xname/xnametypes"
 	"github.com/hashicorp/go-retryablehttp"
 )
