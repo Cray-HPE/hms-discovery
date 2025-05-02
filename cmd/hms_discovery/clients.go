@@ -66,10 +66,10 @@ func getSLSSearchHardware(ctx context.Context, params map[string]string) (map[st
 	// base.SetHTTPUserAgent(req, insta)
 
 	response, err := httpClient.Do(req)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("failed to perform GET request against SLS"), err)
 	}
-	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		return nil, fmt.Errorf("unexpected status code %d expected 200", response.StatusCode)
@@ -102,10 +102,10 @@ func getHSMStateComponents(ctx context.Context, params map[string]string) (map[s
 	// base.SetHTTPUserAgent(req, insta)
 
 	response, err := httpClient.Do(req)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("failed to perform GET request against HSM"), err)
 	}
-	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		return nil, fmt.Errorf("unexpected status code %d expected 200", response.StatusCode)
@@ -147,10 +147,10 @@ func postHSMStateComponent(ctx context.Context, component base.Component) error 
 	// base.SetHTTPUserAgent(request, sc.instanceName)
 
 	response, err := httpClient.Do(req)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		return errors.Join(fmt.Errorf("failed to perform POST request against HSM"), err)
 	}
-	defer response.Body.Close()
 
 	// If HSM sends back a response, then we should read the contents of the body so the Istio sidecar doesn't fill up
 	var responseString string
@@ -180,10 +180,10 @@ func getHSMInventoryRedfishEndpoint(ctx context.Context, xname string) (rf.Redfi
 	// base.SetHTTPUserAgent(request, sc.instanceName)
 
 	response, err := httpClient.Do(req)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		return rf.RedfishEPDescription{}, errors.Join(fmt.Errorf("failed to perform GET request against HSM"), err)
 	}
-	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		// If HSM sends back a response, then we should read the contents of the body so the Istio sidecar doesn't fill up

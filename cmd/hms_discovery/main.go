@@ -35,6 +35,7 @@ import (
 	"sync"
 	"time"
 
+	base "github.com/Cray-HPE/hms-base/v2"
 	compcredentials "github.com/Cray-HPE/hms-compcredentials"
 	"github.com/Cray-HPE/hms-discovery/internal/http_logger"
 	"github.com/Cray-HPE/hms-discovery/pkg/pdu_credential_store"
@@ -134,6 +135,7 @@ func getNotDiscoveredOKEndpointFromHSM() (notDiscoveredEndpoints []rf.RedfishEPD
 	url := fmt.Sprintf("%s/Inventory/RedfishEndpoints", *hsmURL)
 
 	response, err := httpClient.Get(url)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		logger.Error("Failed to get RedfishEndpoints from HSM!", zap.Error(err))
 		return
@@ -149,7 +151,6 @@ func getNotDiscoveredOKEndpointFromHSM() (notDiscoveredEndpoints []rf.RedfishEPD
 		logger.Error("Failed to read body!", zap.Error(err))
 		return
 	}
-	defer response.Body.Close()
 
 	var allEndpoints RedfishEndpointArray
 	err = json.Unmarshal(jsonBytes, &allEndpoints)
@@ -196,6 +197,7 @@ func reDiscoverEndpoints(endpoints []string) {
 	request.Header.Set("Content-Type", "application/json")
 
 	response, doErr := httpClient.Do(request)
+	defer base.DrainAndCloseResponseBody(response)
 	if doErr != nil {
 		logger.Error("Failed to execute POST request!", zap.Error(doErr))
 		return
