@@ -438,7 +438,7 @@ func getXnameForSwitchPort(managementSwitchXname string, portName string) (xname
 		"&extra_properties.VendorName=%s&parent=%s", *slsURL, portName, managementSwitchXname)
 
 	response, err := httpClient.Get(url)
-	base.DrainAndCloseResponseBody(response)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		return
 	}
@@ -500,7 +500,7 @@ func getSwitches() (managementSwitches []switches.ManagementSwitch, err error) {
 	url := fmt.Sprintf("%s/v1/search/hardware?type=comptype_mgmt_switch&class=River", *slsURL)
 
 	response, err := httpClient.Get(url)
-	base.DrainAndCloseResponseBody(response)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		return
 	}
