@@ -31,6 +31,7 @@ import (
 	"os"
 	"strings"
 
+	base "github.com/Cray-HPE/hms-base/v2"
 	compcredentials "github.com/Cray-HPE/hms-compcredentials"
 	"github.com/Cray-HPE/hms-discovery/pkg/snmp_utilities"
 	"github.com/Cray-HPE/hms-discovery/pkg/switches"
@@ -366,6 +367,7 @@ func checkBMCRedfish(xname string, fqdn string) (err error) {
 		request.SetBasicAuth(creds.Username, creds.Password)
 
 		response, doErr := httpClient.Do(request)
+		base.DrainAndCloseResponseBody(response)
 		if doErr != nil {
 			err = fmt.Errorf("failed to execute GET request: %w", doErr)
 			continue
@@ -406,6 +408,7 @@ func informHSM(xname string, fqdn string, macAddr string) (err error) {
 	request.Header.Set("Content-Type", "application/json")
 
 	response, doErr := httpClient.Do(request)
+	base.DrainAndCloseResponseBody(response)
 	if doErr != nil {
 		err = fmt.Errorf("failed to execute POST request: %w", doErr)
 		return
@@ -416,7 +419,8 @@ func informHSM(xname string, fqdn string, macAddr string) (err error) {
 		// then PATCH the entry.
 		request.Method = "PATCH"
 
-		_, doErr := httpClient.Do(request)
+		response, doErr := httpClient.Do(request)
+		base.DrainAndCloseResponseBody(response)
 		if doErr != nil {
 			err = fmt.Errorf("failed to execute PATCH request: %w", doErr)
 			return
@@ -434,6 +438,7 @@ func getXnameForSwitchPort(managementSwitchXname string, portName string) (xname
 		"&extra_properties.VendorName=%s&parent=%s", *slsURL, portName, managementSwitchXname)
 
 	response, err := httpClient.Get(url)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		return
 	}
@@ -447,7 +452,6 @@ func getXnameForSwitchPort(managementSwitchXname string, portName string) (xname
 	if err != nil {
 		return
 	}
-	defer response.Body.Close()
 
 	var genericHardware []sls_common.GenericHardware
 	err = json.Unmarshal(jsonBytes, &genericHardware)
@@ -496,6 +500,7 @@ func getSwitches() (managementSwitches []switches.ManagementSwitch, err error) {
 	url := fmt.Sprintf("%s/v1/search/hardware?type=comptype_mgmt_switch&class=River", *slsURL)
 
 	response, err := httpClient.Get(url)
+	defer base.DrainAndCloseResponseBody(response)
 	if err != nil {
 		return
 	}
@@ -509,7 +514,6 @@ func getSwitches() (managementSwitches []switches.ManagementSwitch, err error) {
 	if err != nil {
 		return
 	}
-	defer response.Body.Close()
 
 	var genericHardware []sls_common.GenericHardware
 	unmarshalErr := json.Unmarshal(jsonBytes, &genericHardware)

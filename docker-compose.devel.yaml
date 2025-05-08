@@ -14,7 +14,7 @@ services:
   # The KV enabler comes from:
   # https://github.com/Cray-HPE/hms-redfish-translation-layer/blob/master/vault-kv-enabler.dockerfile
   vault-kv-enabler:
-    image: artifactory.algol60.net/csm-docker/stable/vault-kv-enabler:1.25.0
+    image: artifactory.algol60.net/csm-docker/stable/vault-kv-enabler:1.29.0
 
     environment:
       - VAULT_ADDR=http://vault:8200
@@ -54,7 +54,7 @@ services:
       - POSTGRES_USER=hmsdsuser
       - POSTGRES_DB=hmsds
   cray-smd-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.35.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.38.0
     environment:
       - SMD_DBHOST=hmsds-postgres
       - SMD_DBPORT=5432
@@ -62,7 +62,7 @@ services:
       - hmsds-postgres
     command: /entrypoint.sh smd-init
   cray-smd:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.35.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.38.0
     environment:
       - POSTGRES_HOST=hmsds-postgres
       - POSTGRES_PORT=5432
@@ -93,7 +93,7 @@ services:
       - POSTGRES_DB=sls
       - POSTGRES_HOST_AUTH_METHOD=trust
   sls-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.8.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.9.0
     command: ["sls-init"]
     environment:
       - POSTGRES_HOST=sls-postgres
@@ -102,7 +102,7 @@ services:
     depends_on:
       - sls-postgres
   sls:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.8.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.9.0
     environment:
       - POSTGRES_HOST=sls-postgres
       - DBOPTS=sslmode=disable

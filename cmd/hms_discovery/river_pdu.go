@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"net/http"
 
+	base "github.com/Cray-HPE/hms-base/v2"
 	"github.com/Cray-HPE/hms-discovery/pkg/pdu_credential_store"
 	"github.com/Cray-HPE/hms-smd/v2/pkg/sm"
 	"github.com/hashicorp/go-retryablehttp"
@@ -98,6 +99,7 @@ func getPDUType(unknownComponent sm.CompEthInterfaceV2) (pduType int, err error)
 		request.SetBasicAuth(defaultCreds.Username, defaultCreds.Password)
 
 		response, doErr := httpClient.Do(request)
+		base.DrainAndCloseResponseBody(response)
 		if doErr != nil {
 			logger.Error("failed to execute GET request", zap.Error(doErr))
 		} else if response.StatusCode == http.StatusOK {
@@ -120,6 +122,7 @@ func getPDUType(unknownComponent sm.CompEthInterfaceV2) (pduType int, err error)
 	request.SetBasicAuth(defaultCredentials["Cray"].Username, defaultCredentials["Cray"].Password)
 
 	response, doErr := httpClient.Do(request)
+	base.DrainAndCloseResponseBody(response)
 	if doErr != nil {
 		logger.Error("failed to execute GET request", zap.Error(doErr))
 		return

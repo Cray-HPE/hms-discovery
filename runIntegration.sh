@@ -2,7 +2,7 @@
 #
 # MIT License
 #
-# (C) Copyright [2023] Hewlett Packard Enterprise Development LP
+# (C) Copyright [2023,2025] Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -45,7 +45,7 @@ trap cleanup EXIT
 
 function run_curl() {
     docker run --rm --network "${COMPOSE_PROJECT_NAME}_sim" \
-        artifactory.algol60.net/csm-docker/stable/docker.io/curlimages/curl:7.81.0 \
+        artifactory.algol60.net/csm-docker/stable/docker.io/curlimages/curl:8.13.0 \
         "$@"
 }
 
