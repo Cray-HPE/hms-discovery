@@ -47,7 +47,7 @@ RUN set -ex \
 
 
 # Stage all of the Mountain discovery stuff in advance.
-FROM artifactory.algol60.net/docker.io/alpine:3.21 AS mountain-base
+FROM artifactory.algol60.net/docker.io/alpine:3.22 AS mountain-base
 
 # Pull in the Mountain discovery bits directly from that image.
 # TODO: Update this with 'latest' tag when available in algol60

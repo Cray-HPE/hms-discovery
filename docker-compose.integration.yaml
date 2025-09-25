@@ -40,7 +40,7 @@ services:
     networks:
       - sim
   cray-sls-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.9.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.12.0
     command: ["sls-init"]
     environment:
       - POSTGRES_HOST=sls-postgres
@@ -51,7 +51,7 @@ services:
     networks:
       - sim
   cray-sls:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.9.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.12.0
     environment:
       - POSTGRES_HOST=cray-sls-postgres
       - DBOPTS=sslmode=disable
@@ -83,7 +83,7 @@ services:
     networks:
       - sim
   cray-smd-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.38.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.43.0
     command: /entrypoint.sh smd-init
     environment:
       - SMD_DBHOST=hmsds-postgres
@@ -93,7 +93,7 @@ services:
     networks:
       - sim
   cray-smd:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.38.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.43.0
     environment:
       - POSTGRES_HOST=hmsds-postgres
       - POSTGRES_PORT=5432

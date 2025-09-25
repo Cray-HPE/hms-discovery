@@ -9,8 +9,8 @@ require (
 	github.com/Cray-HPE/hms-compcredentials v1.15.0
 	github.com/Cray-HPE/hms-dns-dhcp v1.8.0
 	github.com/Cray-HPE/hms-securestorage v1.17.0
-	github.com/Cray-HPE/hms-sls/v2 v2.9.0
-	github.com/Cray-HPE/hms-smd/v2 v2.38.0
+	github.com/Cray-HPE/hms-sls/v2 v2.12.0
+	github.com/Cray-HPE/hms-smd/v2 v2.43.0
 	github.com/Cray-HPE/hms-xname v1.4.0
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/k-sone/snmpgo v3.2.0+incompatible
@@ -20,7 +20,7 @@ require (
 )
 
 require (
-	github.com/Cray-HPE/hms-certs v1.7.0 // indirect
+	github.com/Cray-HPE/hms-certs v1.7.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/geoffgarside/ber v1.1.0 // indirect
