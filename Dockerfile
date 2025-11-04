@@ -53,8 +53,8 @@ FROM artifactory.algol60.net/docker.io/alpine:3.22 AS mountain-base
 # TODO: Update this with 'latest' tag when available in algol60
 #COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.9.0 /requirements.txt /mountain-discovery/
 #COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.9.0 /app /mountain-discovery
-COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.9.0-20251104210942.5777902 /requirements.txt /mountain-discovery/
-COPY --from=artifactory.algol60.net/csm-docker/stable/hms-mountain-discovery:0.9.0-20251104210942.5777902 /app /mountain-discovery
+COPY --from=artifactory.algol60.net/csm-docker/unstable/hms-mountain-discovery:0.9.0-20251104210942.5777902 /requirements.txt /mountain-discovery/
+COPY --from=artifactory.algol60.net/csm-docker/unstable/hms-mountain-discovery:0.9.0-20251104210942.5777902 /app /mountain-discovery
 
 RUN set -ex \
     && apk -U upgrade \
