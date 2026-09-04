@@ -83,7 +83,7 @@ services:
     networks:
       - sim
   cray-smd-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.43.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.45.0
     command: /entrypoint.sh smd-init
     environment:
       - SMD_DBHOST=hmsds-postgres
@@ -93,7 +93,7 @@ services:
     networks:
       - sim
   cray-smd:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.43.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.45.0
     environment:
       - POSTGRES_HOST=hmsds-postgres
       - POSTGRES_PORT=5432

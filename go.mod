@@ -10,7 +10,7 @@ require (
 	github.com/Cray-HPE/hms-dns-dhcp v1.8.0
 	github.com/Cray-HPE/hms-securestorage v1.17.0
 	github.com/Cray-HPE/hms-sls/v2 v2.12.0
-	github.com/Cray-HPE/hms-smd/v2 v2.43.0
+	github.com/Cray-HPE/hms-smd/v2 v2.45.0
 	github.com/Cray-HPE/hms-xname v1.4.0
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/k-sone/snmpgo v3.2.0+incompatible
